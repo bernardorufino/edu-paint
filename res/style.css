@@ -1,0 +1,24 @@
+.window {
+    -fx-background-color: #777777;
+}
+.tool-bar, .status-bar, .menu-bar {
+    -fx-background-color: #DDDDDD;
+}
+.canvas-pane {
+    -fx-background-color: #AAAAAA;
+    -fx-border-width: 1 0;
+    -fx-border-color: #9B9B9B;
+}
+.toggle-pill .toggle-button.first {
+    -fx-border-width: 10 10 10 10;
+    -fx-border-radius: 2 0 0 2;
+    -fx-background-radius: 2 0 0 2;
+}
+.toggle-pill .toggle-button {
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
+}
+.toggle-pill .toggle-button.last {
+    -fx-border-radius: 0 2 2 0;
+    -fx-background-radius: 0 2 2 0;
+}

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minWidth="400.0" styleClass="window" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.bernardorufino.paint.ui.WindowController">
+  <columnConstraints>
+    <ColumnConstraints />
+      <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" />
+  </columnConstraints>
+  <rowConstraints>
+    <RowConstraints fillHeight="false" valignment="CENTER" vgrow="NEVER" />
+      <RowConstraints fillHeight="false" minHeight="10.0" valignment="CENTER" vgrow="NEVER" />
+      <RowConstraints fillHeight="false" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="NEVER" />
+    <RowConstraints maxHeight="1.7976931348623157E308" valignment="CENTER" vgrow="ALWAYS" />
+      <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" valignment="CENTER" vgrow="NEVER" />
+  </rowConstraints>
+   <children>
+      <MenuBar fx:id="vMenu" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="NEVER">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Close" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Edit">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Delete" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+      <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" styleClass="status-bar" GridPane.columnIndex="1" GridPane.rowIndex="4">
+         <children>
+            <Label fx:id="vStatus" text="Ready" />
+         </children>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <padding>
+            <Insets left="8.0" right="8.0" />
+         </padding>
+      </HBox>
+      <HBox alignment="CENTER_LEFT" styleClass="tool-bar" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1">
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <children>
+            <ToggleButton fx:id="vPointTool" focusTraversable="false" mnemonicParsing="false" text="Point">
+               <toggleGroup>
+                  <ToggleGroup fx:id="mToolToggle" />
+               </toggleGroup>
+            </ToggleButton>
+            <ToggleButton fx:id="vDdaLineTool" focusTraversable="false" mnemonicParsing="false" selected="true" styleClass="first" text="DDA Line" toggleGroup="$mToolToggle">
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+            </ToggleButton>
+            <ToggleButton fx:id="vBresenhamLineTool" focusTraversable="false" mnemonicParsing="false" style="-fx-border-width: 0;" text="Bresenham Line" toggleGroup="$mToolToggle">
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+            </ToggleButton>
+            <ToggleButton fx:id="vXorLineTool" focusTraversable="false" mnemonicParsing="false" text="Xor Line" toggleGroup="$mToolToggle">
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+            </ToggleButton>
+            <ToggleButton fx:id="vCircleTool" focusTraversable="false" mnemonicParsing="false" text="Circle" toggleGroup="$mToolToggle" />
+            <ToggleButton fx:id="vFreeTool" focusTraversable="false" mnemonicParsing="false" styleClass="last" text="Free" toggleGroup="$mToolToggle" />
+         </children>
+      </HBox>
+      <StackPane styleClass="canvas-pane" GridPane.columnIndex="1" GridPane.rowIndex="3">
+         <children>
+            <Canvas fx:id="vCanvas" height="448.0" styleClass="canvas" width="448.0" />
+         </children>
+      </StackPane>
+      <HBox alignment="TOP_CENTER" styleClass="tool-bar" GridPane.columnIndex="1" GridPane.rowIndex="2">
+         <padding>
+            <Insets bottom="6.0" left="8.0" right="8.0" top="6.0" />
+         </padding>
+         <children>
+            <Button focusTraversable="false" mnemonicParsing="false" onAction="#onCleanButtonClick" text="Clean" />
+            <Separator focusTraversable="false" visible="false" HBox.hgrow="ALWAYS" />
+            <ChoiceBox fx:id="vPattern" focusTraversable="false">
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+            </ChoiceBox>
+            <ColorPicker fx:id="vForegroundColorPicker" focusTraversable="false" />
+         </children>
+      </HBox>
+   </children>
+</GridPane>
