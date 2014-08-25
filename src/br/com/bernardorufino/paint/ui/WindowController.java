@@ -24,10 +24,10 @@ import java.util.*;
 public class WindowController extends ContextAwareController implements Initializable {
 
     public static final String COORD_STATUS = "%d X %d";
-    private static final int RESIZE_FACTOR = 4;
+    private static final int RESIZE_FACTOR = 2;
     public static final List<PatternChoice> PATTERN_CHOICES = ImmutableList.of(
             PatternChoice.create("1", "Continuous"),
-            PatternChoice.create("10", "Dotted"),
+            PatternChoice.create("111000", "Dotted"),
             PatternChoice.create("1110", "Dashed"),
             PatternChoice.create("111010", "Dash-dot")
     );
