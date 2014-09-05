@@ -27,8 +27,8 @@ public class WindowController extends ContextAwareController implements Initiali
     private static final int RESIZE_FACTOR = 2;
     public static final List<PatternChoice> PATTERN_CHOICES = ImmutableList.of(
             PatternChoice.create("1", "Continuous"),
-            PatternChoice.create("111000", "Dotted"),
-            PatternChoice.create("1110", "Dashed"),
+            PatternChoice.create("1100", "Dotted"),
+            PatternChoice.create("1111111000000", "Dashed"),
             PatternChoice.create("111010", "Dash-dot")
     );
 

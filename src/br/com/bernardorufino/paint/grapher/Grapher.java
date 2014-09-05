@@ -8,6 +8,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.paint.Color;
 
 import java.util.BitSet;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 public class Grapher {
@@ -185,17 +186,39 @@ public class Grapher {
 
     public Grapher drawCircle(Point c, double radius) {
         // Activates the drawing of patterns
-        setPatternDraw(true);
+        setPatternDraw(false);
         // Draw the different eights of the circumference in order so as to display the pattern properly
-        drawEighthCircle(c, radius, p -> safeDrawPixel(p.minus(c).plus(c)));
-        drawEighthCircle(c, radius, p -> safeDrawPixel(p.minus(c).transpose().plus(c)));
-        drawEighthCircle(c, radius, p -> safeDrawPixel(p.minus(c).flipX().transpose().plus(c)));
-        drawEighthCircle(c, radius, p -> safeDrawPixel(p.minus(c).flipX().plus(c)));
-        drawEighthCircle(c, radius, p -> safeDrawPixel(p.minus(c).opposite().plus(c)));
-        drawEighthCircle(c, radius, p -> safeDrawPixel(p.minus(c).opposite().transpose().plus(c)));
-        drawEighthCircle(c, radius, p -> safeDrawPixel(p.minus(c).flipY().transpose().plus(c)));
-        drawEighthCircle(c, radius, p -> safeDrawPixel(p.minus(c).flipY().plus(c)));
+        AtomicInteger pxCount = new AtomicInteger(0);
+        drawEighthCircle(c, radius, p -> drawCircPixel(false, pxCount, p.minus(c).plus(c)));
+        int count = pxCount.get();
+        pxCount.set(pxCount.get() + count);
+        drawEighthCircle(c, radius, p -> drawCircPixel(true, pxCount, p.minus(c).transpose().plus(c)));
+        pxCount.set(pxCount.get() + count);
+        drawEighthCircle(c, radius, p -> drawCircPixel(false, pxCount, p.minus(c).flipX().transpose().plus(c)));
+        pxCount.set(pxCount.get() + count);
+        drawEighthCircle(c, radius, p -> drawCircPixel(true, pxCount, p.minus(c).flipX().plus(c)));
+        pxCount.set(pxCount.get() + count);
+        drawEighthCircle(c, radius, p -> drawCircPixel(false, pxCount, p.minus(c).opposite().plus(c)));
+        pxCount.set(pxCount.get() + count);
+        drawEighthCircle(c, radius, p -> drawCircPixel(true, pxCount, p.minus(c).opposite().transpose().plus(c)));
+        pxCount.set(pxCount.get() + count);
+        drawEighthCircle(c, radius, p -> drawCircPixel(false, pxCount, p.minus(c).flipY().transpose().plus(c)));
+        pxCount.set(pxCount.get() + count);
+        drawEighthCircle(c, radius, p -> drawCircPixel(true, pxCount, p.minus(c).flipY().plus(c)));
         return this;
+    }
+
+    private void drawCircPixel(boolean reverse, AtomicInteger count, Point p) {
+        BitSet pattern = patternProperty().getValue();
+        int pos = count.get() % pattern.length();
+        if (pattern.get(pos)) {
+            safeDrawPixel(p);
+        }
+        if (reverse) {
+            count.decrementAndGet();
+        } else {
+            count.incrementAndGet();
+        }
     }
 
     // Draws one eight of a circumference, given the central point, the radius and a function
