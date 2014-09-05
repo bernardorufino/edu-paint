@@ -327,13 +327,25 @@ public class Grapher {
 
     private void floodFillPolygon (List<Point> poly) {
         List<Point> triangle = new ArrayList<>();
-        while (poly.size() > 3) {
-            triangle.add(poly.get(0));
-            triangle.add(poly.get(poly.size()));
-            triangle.add(poly.get(poly.size()-1));
-            poly.remove(poly.get(poly.size()));
+        while (poly.size() > 3) { //run untill the  polygon is triangulated
+            boolean earFound = false;
+            int i = poly.size(); // starts with the last vertex
+            while (!earFound) {
+                Point mediumPoint = poly.get(i-1).plus(poly.get((i+1)%poly.size())).times(0.5);
+                if (isInsidePolygon(poly, mediumPoint)) { // check if vertex i makes an ear
+                    triangle.add(poly.get(i));
+                    triangle.add(poly.get(i-1));
+                    triangle.add(poly.get((i+1)%poly.size()));
+                    floodFillTriangulatedPolygon(triangle); // fill the triangle just created
+                    poly.remove(i); // remove the ear
+                    earFound = true;
+                }
+                else { // if that vertex doesn't make an ear, try the preceding one
+                    i--;
+                }
+            }
         }
-        floodFillTriangulatedPolygon(poly);
+        floodFillTriangulatedPolygon(poly); // fill the last triangle
     }
 
     private void floodFillTriangulatedPolygon (List<Point> poly) {
