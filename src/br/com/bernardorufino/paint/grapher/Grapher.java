@@ -326,6 +326,17 @@ public class Grapher {
     }
 
     private void floodFillPolygon (List<Point> poly) {
+        List<Point> triangle = new ArrayList<>();
+        while (poly.size() > 3) {
+            triangle.add(poly.get(0));
+            triangle.add(poly.get(poly.size()));
+            triangle.add(poly.get(poly.size()-1));
+            poly.remove(poly.get(poly.size()));
+        }
+        floodFillTriangulatedPolygon(poly);
+    }
+
+    private void floodFillTriangulatedPolygon (List<Point> poly) {
         Point seed = Point.at(0,0);
         for (Point vertex : poly) {
             seed.x += vertex.x;
@@ -333,6 +344,7 @@ public class Grapher {
         }
         seed.x /= poly.size();
         seed.y /= poly.size();
+
         floodFill(seed);
     }
 
