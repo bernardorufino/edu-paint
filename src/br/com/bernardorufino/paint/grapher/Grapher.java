@@ -255,7 +255,7 @@ public class Grapher {
     private void floodFill (Point start) {
         if (start.isEmpty()) {
             getFrameBuffer().setPixel(start.x, start.y, getColor());
-            floodFill(Point.at(start.x + 1, start.y));
+            floodFill(Point.at(start.x+1, start.y));
             floodFill(Point.at(start.x-1, start.y));
             floodFill(Point.at(start.x, start.y+1));
             floodFill(Point.at(start.x, start.y-1));
