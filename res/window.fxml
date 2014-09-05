@@ -77,6 +77,7 @@
             </ToggleButton>
             <ToggleButton fx:id="vCircleTool" focusTraversable="false" mnemonicParsing="false" text="Circle" toggleGroup="$mToolToggle" />
             <ToggleButton fx:id="vFreeTool" focusTraversable="false" mnemonicParsing="false" styleClass="last" text="Free" toggleGroup="$mToolToggle" />
+            <ToggleButton fx:id="vPolygonTool" focusTraversable="false" mnemonicParsing="false" text="Polygon" toggleGroup="$mToolToggle" />
          </children>
       </HBox>
       <StackPane styleClass="canvas-pane" GridPane.columnIndex="1" GridPane.rowIndex="3">
