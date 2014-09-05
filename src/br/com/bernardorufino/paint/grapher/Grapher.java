@@ -319,7 +319,7 @@ public class Grapher {
     }
 
     private void floodFill (Point start) {
-//        if (start.isEmpty()) {
+//        if (start.isEmpty()) { // making sure that the current point is neither filled yet nor is an edge point
 //            getFrameBuffer().setPixel(start.x, start.y, getColor());
 //            floodFill(Point.at(start.x+1, start.y));
 //            floodFill(Point.at(start.x-1, start.y));
