@@ -36,14 +36,14 @@ public class Polygon {
 
     public Edge[] getEdges() {
 
-        Edge[] edges = new Edge[mPolygon.size()-1];
+        Edge[] edges = new Edge[mPolygon.size()];
 
-        for (int i = 0; i < mPolygon.size() - 1; i++)
+        for (int i = 0; i < mPolygon.size(); i++)
         {
-            if (mPolygon.get(i).y < mPolygon.get((i + 1)%(mPolygon.size()-1)).y)
-                edges[i] = new Edge(mPolygon.get(i), mPolygon.get((i + 1)%(mPolygon.size()-1)));
+            if (mPolygon.get(i).y < mPolygon.get((i + 1)%(mPolygon.size())).y)
+                edges[i] = new Edge(mPolygon.get(i), mPolygon.get((i + 1)%(mPolygon.size())));
             else
-                edges[i] = new Edge(mPolygon.get((i + 1)%(mPolygon.size()-1)), mPolygon.get(i));
+                edges[i] = new Edge(mPolygon.get((i + 1)%(mPolygon.size())), mPolygon.get(i));
         }
         return edges;
     }

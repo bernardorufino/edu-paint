@@ -30,7 +30,7 @@ public abstract class PolygonTool extends Tool {
             Point q = mPolygon.get(mPolygon.size() - 1);
             Point r = mPolygon.get(0);
             mGrapher.drawBresenhamLine(q, r);
-            fill(mPolygon);
+            fill(new ArrayList<>(mPolygon));
             mPolygon.clear();
         }
     }
