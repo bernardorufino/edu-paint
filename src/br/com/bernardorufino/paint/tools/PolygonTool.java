@@ -1,14 +1,13 @@
 package br.com.bernardorufino.paint.tools;
 
 import br.com.bernardorufino.paint.ext.Point;
-import br.com.bernardorufino.paint.ext.Polygon;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PolygonTool extends Tool {
+public abstract class PolygonTool extends Tool {
 
     private List<Point> mPolygon = new ArrayList<>();
 
@@ -16,13 +15,25 @@ public class PolygonTool extends Tool {
     public void onMouseClicked(MouseEvent event) {
         super.onMouseClicked(event);
         if (event.getButton() == MouseButton.PRIMARY) {
-            mPolygon.add(getPosition(event));
+            Point p = getPosition(event);
+            if (mPolygon.isEmpty()) {
+                mGrapher.drawPixel(p);
+            } else {
+                Point q = mPolygon.get(mPolygon.size() - 1);
+                mGrapher.drawBresenhamLine(q, p);
+            }
+            mPolygon.add(p);
         } else if (event.getButton() == MouseButton.SECONDARY) {
-            mPolygon.add(getPosition(event));
-     //       mGrapher.drawPolygon(new Polygon(mPolygon));
-            mGrapher.scanFill(new Polygon(mPolygon));
-            // Call grapher with the points
+            if (mPolygon.size() < 2) {
+                return;
+            }
+            Point q = mPolygon.get(mPolygon.size() - 1);
+            Point r = mPolygon.get(0);
+            mGrapher.drawBresenhamLine(q, r);
+            fill(mPolygon);
             mPolygon.clear();
         }
     }
+
+    protected abstract void fill(List<Point> polygon);
 }

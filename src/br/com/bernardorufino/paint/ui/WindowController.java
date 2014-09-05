@@ -44,8 +44,9 @@ public class WindowController extends ContextAwareController implements Initiali
     @FXML public ToggleButton vPointTool;
     @FXML public ToggleButton vFreeTool;
     @FXML public ToggleButton vCircleTool;
+    @FXML public ToggleButton vScanLineTool;
+    @FXML public ToggleButton vFloodFillTool;
     @FXML public ToggleGroup mToolToggle;
-    @FXML public ToggleButton vPolygonTool;
     @FXML public ColorPicker vForegroundColorPicker;
     @FXML public ChoiceBox<PatternChoice> vPattern;
 
@@ -86,7 +87,8 @@ public class WindowController extends ContextAwareController implements Initiali
                 .put(vCircleTool, new CircleTool())
                 .put(vPointTool, new PointTool())
                 .put(vFreeTool, new FreeTool())
-                .put(vPolygonTool, new PolygonTool())
+                .put(vFloodFillTool, new FloodFillTool())
+                .put(vScanLineTool, new ScanLineTool())
                 .build();
         mTools = new ArrayList<>(tools.size());
         tools.forEach((button, tool) -> {
