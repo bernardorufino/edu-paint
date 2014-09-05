@@ -1,6 +1,12 @@
 package br.com.bernardorufino.paint.ext;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 public class Point {
+
+    public static Point origin() {
+        return Point.at(0, 0);
+    }
 
     public static Point at(double x, double y) {
         return new Point((int) x, (int) y);
@@ -52,6 +58,11 @@ public class Point {
 
     public Point times(double f) {
         return Point.at(x * f, y * f);
+    }
+
+    public Point divide(double f) {
+        checkArgument(f != 0, "Cannot divide by 0");
+        return times(1 / f);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package br.com.bernardorufino.paint.utils;
 
+import br.com.bernardorufino.paint.ext.BitMatrix;
 import javafx.scene.paint.Color;
 
 import java.util.BitSet;
@@ -16,6 +17,20 @@ public class DrawUtils {
             }
         }
         return bitSet;
+    }
+
+    public static BitMatrix pattern2d(String pattern2d) {
+        String[] patternRows = pattern2d.split("\n");
+        int rows = patternRows.length;
+        int columns = patternRows[0].length();
+        BitMatrix bitMatrix = new BitMatrix(rows, columns);
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
+                char c = patternRows[i].charAt(j);
+                bitMatrix.set(i, j, (c != '0'));
+            }
+        }
+        return bitMatrix;
     }
 
     public static Color fromIntTocolor(int color) {

@@ -1,5 +1,6 @@
 package br.com.bernardorufino.paint.ui;
 
+import br.com.bernardorufino.paint.ext.BitMatrix;
 import br.com.bernardorufino.paint.ext.ContextAwareController;
 import br.com.bernardorufino.paint.ext.Properties;
 import br.com.bernardorufino.paint.grapher.FrameBuffer;
@@ -29,9 +30,35 @@ public class WindowController extends ContextAwareController implements Initiali
             PatternChoice.create("1", "Continuous"),
             PatternChoice.create("1100", "Dotted"),
             PatternChoice.create("1111111000000", "Dashed"),
-            PatternChoice.create("111010", "Dash-dot")
-    );
-
+            PatternChoice.create("111010", "Dash-dot"));
+    public static final List<Pattern2dChoice> PATTERN_2D_CHOICES = ImmutableList.of(
+            Pattern2dChoice.create("1", "Flat"),
+            Pattern2dChoice.create(
+                    "10\n" +
+                    "01", "Small Grid"),
+            Pattern2dChoice.create(
+                    "1100\n" +
+                    "1100\n" +
+                    "0011\n" +
+                    "0011", "Big Grid"),
+            Pattern2dChoice.create(
+                    "10\n" +
+                    "10", "Y Stripes"),
+            Pattern2dChoice.create(
+                    "11\n" +
+                    "00", "X Stripes"),
+            Pattern2dChoice.create(
+                    "111111\n" +
+                    "110011\n" +
+                    "100001\n" +
+                    "110011\n" +
+                    "111111\n", "Circle"),
+            Pattern2dChoice.create(
+                    "111111\n" +
+                    "110011\n" +
+                    "100001\n" +
+                    "110011\n" +
+                    "111111\n", "Circle"));
 
     private static final Tool NOP_TOOL = new Tool() { /* No-op */ };
 
@@ -49,13 +76,13 @@ public class WindowController extends ContextAwareController implements Initiali
     @FXML public ToggleGroup mToolToggle;
     @FXML public ColorPicker vForegroundColorPicker;
     @FXML public ChoiceBox<PatternChoice> vPattern;
+    @FXML public ChoiceBox<Pattern2dChoice> vPattern2d;
 
     private GraphicsContext mGc;
     private Tool mNopTool;
     private FrameBuffer mFb;
     private Grapher mGrapher;
     private List<Tool> mTools;
-    private ObservableList<PatternChoice> mPatternChoices;
 
 
     @Override
@@ -110,10 +137,16 @@ public class WindowController extends ContextAwareController implements Initiali
         vForegroundColorPicker.setValue(Color.BLACK); // Trigger change
 
         // Pattern choices
-        mPatternChoices = FXCollections.observableArrayList(PATTERN_CHOICES);
-        vPattern.setItems(mPatternChoices);
+        ObservableList<PatternChoice> patternChoices = FXCollections.observableArrayList(PATTERN_CHOICES);
+        vPattern.setItems(patternChoices);
         Properties.bind(mGrapher.patternProperty(), p -> p.pattern, vPattern.valueProperty());
         vPattern.getSelectionModel().select(0);
+
+        // Pattern2d choices
+        ObservableList<Pattern2dChoice> pattern2dChoices = FXCollections.observableArrayList(PATTERN_2D_CHOICES);
+        vPattern2d.setItems(pattern2dChoices);
+        Properties.bind(mGrapher.pattern2dProperty(), p -> p.pattern2d, vPattern2d.valueProperty());
+        vPattern2d.getSelectionModel().select(0);
     }
 
     private Tool getCurrentTool() {
@@ -156,6 +189,39 @@ public class WindowController extends ContextAwareController implements Initiali
         @Override
         public int hashCode() {
             return pattern.hashCode();
+        }
+    }
+
+    public static class Pattern2dChoice {
+
+        public static Pattern2dChoice create(String pattern2d, String label) {
+            return new Pattern2dChoice(DrawUtils.pattern2d(pattern2d), label);
+        }
+
+        public BitMatrix pattern2d;
+        public String label;
+
+        public Pattern2dChoice(BitMatrix pattern2d, String label) {
+            this.pattern2d = pattern2d;
+            this.label = label;
+        }
+
+        @Override
+        public String toString() {
+            return label;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Pattern2dChoice)) return false;
+            Pattern2dChoice that = (Pattern2dChoice) o;
+            return !(pattern2d != null ? !pattern2d.equals(that.pattern2d) : that.pattern2d != null);
+        }
+
+        @Override
+        public int hashCode() {
+            return pattern2d != null ? pattern2d.hashCode() : 0;
         }
     }
 }

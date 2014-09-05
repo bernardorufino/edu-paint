@@ -1,10 +1,9 @@
 package br.com.bernardorufino.paint.grapher;
 
-import br.com.bernardorufino.paint.ext.Edge;
-import br.com.bernardorufino.paint.ext.Point;
-import br.com.bernardorufino.paint.ext.Polygon;
+import br.com.bernardorufino.paint.ext.*;
 import br.com.bernardorufino.paint.utils.DrawUtils;
 import com.google.common.base.Converter;
+import com.google.common.collect.Lists;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.paint.Color;
@@ -20,8 +19,9 @@ public class Grapher {
 
     private Property<Color> mColorProperty = new SimpleObjectProperty<>();
     private Property<BitSet> mPatternProperty = new SimpleObjectProperty<>();
+    private Property<BitMatrix> mPattern2dProperty = new SimpleObjectProperty<>();
     private final FrameBuffer mFb;
-    private boolean mPatternDraw;
+    private PatternType mPatternDraw = PatternType.NONE;
     private int mPixelCount;
 
     public Grapher(FrameBuffer fb) {
@@ -40,16 +40,29 @@ public class Grapher {
         return mPatternProperty;
     }
 
-    private boolean showPixelAndIncrement() {
-        BitSet pattern = mPatternProperty.getValue();
-        int bit = (mPixelCount++) % pattern.length();
-        return !mPatternDraw || pattern.get(bit);
+    public Property<BitMatrix> pattern2dProperty() {
+        return mPattern2dProperty;
+    }
+
+    private boolean showPixelAndAdjustPattern(Point p) {
+        switch (mPatternDraw) {
+            case D1:
+                BitSet pattern = mPatternProperty.getValue();
+                int bit = (mPixelCount++) % pattern.length();
+                return pattern.get(bit);
+            case D2:
+                BitMatrix pattern2d = mPattern2dProperty.getValue();
+                return pattern2d.get(p.y % pattern2d.getRows(), p.x % pattern2d.getColumns());
+            case NONE:
+                return true;
+        }
+        throw new AssertionError();
     }
 
     // In order to draw with patterns one should make sure pixels are painted in order on the screen
-    private void setPatternDraw(boolean patternDraw) {
-        mPatternDraw = patternDraw;
-        if (mPatternDraw) {
+    private void setPatternDraw(PatternType patternType) {
+        mPatternDraw = patternType;
+        if (patternType == PatternType.D1) {
             mPixelCount = 0;
         }
     }
@@ -65,7 +78,7 @@ public class Grapher {
         // Checks whether is supposed to show the pixel, because we could be on
         // a negative bit of a pattern, hence shouldn't draw the pixel. After
         // checking increment the pixel counter to use for the pattern.
-        if (showPixelAndIncrement()) {
+        if (showPixelAndAdjustPattern(p)) {
             mFb.setPixel(p.x, p.y, getColor());
         }
         return this;
@@ -113,18 +126,22 @@ public class Grapher {
     public Grapher drawDdaLine(Point p, Point q) {
         // Activates the drawing of patterns in order to keep track of which pixels to
         // write on the screen
-        setPatternDraw(true);
+        setPatternDraw(PatternType.D1);
         // Calls the DDA algorithm with drawPixel function
         drawDdaLine(p, q, this::drawPixel);
         return this;
     }
 
-    public Grapher drawBresenhamLine(Point p, Point q) {
+    public Grapher drawBresenhamLine(Point p, Point q, PatternType patternType) {
         // Activates the drawing of patterns
-        setPatternDraw(true);
+        setPatternDraw(patternType);
         // Calls the Bresenham algorithm with usual drawPixel function
         drawBresenhamLine(p, q, this::drawPixel);
         return this;
+    }
+
+    public Grapher drawBresenhamLine(Point p, Point q) {
+        return drawBresenhamLine(p, q, PatternType.D1);
     }
 
     public Grapher drawPolygon() {
@@ -195,7 +212,7 @@ public class Grapher {
 
     public Grapher drawCircle(Point c, double radius) {
         // Activates the drawing of patterns
-        setPatternDraw(false);
+        setPatternDraw(PatternType.NONE);
         // Draw the different eights of the circumference in order so as to display the pattern properly
         AtomicInteger pxCount = new AtomicInteger(0);
         drawEighthCircle(c, radius, p -> drawCircPixel(false, pxCount, p.minus(c).plus(c)));
@@ -275,6 +292,8 @@ public class Grapher {
     }
 
     public void scanFill (Polygon polygon) {
+        setPatternDraw(PatternType.D2);
+
         List<Edge> sortedEdges = polygon.getSortedEdges();
         List<Integer> xCrossings = new ArrayList<Integer>();
 
@@ -305,10 +324,14 @@ public class Grapher {
             }
             Collections.sort(xCrossings);
             for (int i = 0; i < xCrossings.size(); i+=2) {
-                drawBresenhamLine(Point.at(xCrossings.get(i), scanline), Point.at(xCrossings.get(i+1), scanline));
+                drawBresenhamLine(Point.at(xCrossings.get(i), scanline), Point.at(xCrossings.get(i+1), scanline), PatternType.D2);
             }
 
         }
+    }
+
+    public int getPixelColor(Point p) {
+        return mFb.getPixel(p.x, p.y);
     }
 
     public FrameBuffer getFrameBuffer() {
@@ -348,6 +371,18 @@ public class Grapher {
         floodFillTriangulatedPolygon(poly); // fill the last triangle
     }
 
+    private boolean isInsidePolygon(List<Point> polygon, Point p) {
+        List<Pair<Point, Point>> edges = polygon.stream().collect(() -> Lists.newArrayList(Pair.of(null, null)), (ArrayList<Pair<Point, Point>> es, Point q) -> {
+            es.get(es.size() - 1).last = q;
+            es.add(Pair.of(q, null)); /* TODO: Unchecked */
+        }, (a, b) -> {});
+        edges = edges.subList(1, edges.size() - 1);
+        return edges.stream()
+                .filter(e -> Math.max(e.first.x, e.last.x) > p.x)
+                .filter(e -> Math.min(e.first.y, e.last.y) < p.y && p.y < Math.max(e.first.y, e.last.y))
+                .count() % 2 == 1;
+    }
+
     private void floodFillTriangulatedPolygon (List<Point> poly) {
         Point seed = Point.at(0,0);
         for (Point vertex : poly) {
@@ -360,4 +395,5 @@ public class Grapher {
         floodFill(seed);
     }
 
+    private static enum PatternType { D1, D2, NONE }
 }

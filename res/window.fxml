@@ -93,6 +93,11 @@
          <children>
             <Button focusTraversable="false" mnemonicParsing="false" onAction="#onCleanButtonClick" text="Clean" />
             <Separator focusTraversable="false" visible="false" HBox.hgrow="ALWAYS" />
+            <ChoiceBox fx:id="vPattern2d" focusTraversable="false">
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+            </ChoiceBox>
             <ChoiceBox fx:id="vPattern" focusTraversable="false">
                <opaqueInsets>
                   <Insets />
