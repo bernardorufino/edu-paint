@@ -17,9 +17,7 @@ public class Edge {
         x += (1/m);
     }
 
-    public void on() {
-        x = p1.x;
-    }
+    public void on() { x = p1.x; }
 
     public void off() {
         x = p2.x;

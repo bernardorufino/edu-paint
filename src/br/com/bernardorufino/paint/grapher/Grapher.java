@@ -276,7 +276,6 @@ public class Grapher {
 
     public void scanFill (Polygon polygon) {
         List<Edge> sortedEdges = polygon.getSortedEdges();
-
         List<Integer> xCrossings = new ArrayList<Integer>();
 
         for (int scanline = polygon.getYMin(); scanline <= polygon.getYMax(); scanline++)
@@ -293,13 +292,11 @@ public class Grapher {
                         sortedEdge.on();
                     }
                 }
-
                 // highest Y vertice intersection
                 if (scanline == sortedEdge.p2.y) {
                     sortedEdge.off();
                     xCrossings.add((int) sortedEdge.getX());
                 }
-
                 // intersection in the middle of the edge
                 if (scanline > sortedEdge.p1.y && scanline < sortedEdge.p2.y) {
                     sortedEdge.update();

@@ -34,7 +34,7 @@ public class Polygon {
         return yMin;
     }
 
-    public List<Edge> getSortedEdges() {
+    public Edge[] getEdges() {
 
         Edge[] edges = new Edge[mPolygon.size()-1];
 
@@ -45,10 +45,11 @@ public class Polygon {
             else
                 edges[i] = new Edge(mPolygon.get((i + 1)%(mPolygon.size()-1)), mPolygon.get(i));
         }
-        return Arrays.asList(sortedEdges(edges));
+        return edges;
     }
 
-    private Edge[] sortedEdges(Edge[] edges) {
+    public List<Edge> getSortedEdges() {
+        Edge[] edges = getEdges();
         Edge tmp;
         for (int i = 0; i < edges.length - 1; i++) {
             for (int j = 0; j < edges.length - 1; j++) {
@@ -59,7 +60,7 @@ public class Polygon {
                 }
             }
         }
-        return edges;
+        return Arrays.asList(edges);
     }
 
     public List<Point> getVertices() {
