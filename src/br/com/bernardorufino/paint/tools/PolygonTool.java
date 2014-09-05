@@ -1,6 +1,7 @@
 package br.com.bernardorufino.paint.tools;
 
 import br.com.bernardorufino.paint.ext.Point;
+import br.com.bernardorufino.paint.ext.Polygon;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
@@ -18,6 +19,7 @@ public class PolygonTool extends Tool {
             mPolygon.add(getPosition(event));
         } else if (event.getButton() == MouseButton.SECONDARY) {
             mPolygon.add(getPosition(event));
+            mGrapher.scanFill(new Polygon(mPolygon));
             // Call grapher with the points
             mPolygon.clear();
         }

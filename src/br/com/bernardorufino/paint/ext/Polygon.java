@@ -1,7 +1,5 @@
 package br.com.bernardorufino.paint.ext;
 
-import br.com.bernardorufino.paint.ext.Point;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -10,18 +8,15 @@ import java.util.List;
  * Created by diogosfreitas on 04/09/2014.
  */
 public class Polygon {
-    List<Point> polygon;
+    private List<Point> mPolygon = new ArrayList<>();
 
-    public Polygon(Point... points) {
-        polygon = new ArrayList<Point>();
-        for (Point p : points) {
-            polygon.add(p);
-        }
+    public Polygon(List<? extends Point> vertices) {
+        mPolygon.addAll(vertices);
     }
 
     public int getYMax() {
         int yMax = 0;
-        for(Point p : polygon) {
+        for(Point p : mPolygon) {
             if(p.y > yMax) {
                 yMax = p.y;
             }
@@ -31,7 +26,7 @@ public class Polygon {
 
     public int getYMin() {
         int yMin = 0;
-        for(Point p : polygon) {
+        for(Point p : mPolygon) {
             if(p.y > yMin) {
                 yMin = p.y;
             }
@@ -41,7 +36,7 @@ public class Polygon {
 /*
     public int getXMax() {
         int xMax = 0;
-        for(Point p : polygon) {
+        for(Point p : mPolygon) {
             if(p.x > xMax) {
                 xMax = p.x;
             }
@@ -51,7 +46,7 @@ public class Polygon {
 
     public int getXMin() {
         int xMin = 0;
-        for(Point p : polygon) {
+        for(Point p : mPolygon) {
             if(p.x > xMin) {
                 xMin = p.x;
             }
@@ -75,19 +70,19 @@ public class Polygon {
 
     public List<Edge> getSortedEdges() {
 
-        Edge[] sortedEdges = new Edge[polygon.size()-1];
-        for (int i = 0; i < polygon.size() - 1; i++)
+        Edge[] sortedEdges = new Edge[mPolygon.size()-1];
+        for (int i = 0; i < mPolygon.size() - 1; i++)
         {
-            if (polygon.get(i).y < polygon.get(i + 1).y)
-                sortedEdges[i] = new Edge(polygon.get(i), polygon.get(i + 1));
+            if (mPolygon.get(i).y < mPolygon.get(i + 1).y)
+                sortedEdges[i] = new Edge(mPolygon.get(i), mPolygon.get(i + 1));
             else
-                sortedEdges[i] = new Edge(polygon.get(i + 1), polygon.get(i));
+                sortedEdges[i] = new Edge(mPolygon.get(i + 1), mPolygon.get(i));
         }
         return Arrays.asList(sortedEdges);
     }
 
     public List<Point> getPoints() {
-        return polygon;
+        return mPolygon;
     }
 
 }

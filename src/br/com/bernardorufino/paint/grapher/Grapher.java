@@ -281,36 +281,29 @@ public class Grapher {
         for (int scanline = polygon.getYMin(); scanline <= polygon.getYMax(); scanline++)
         {
             xCrossings.clear();
-            for (int i = 0; i < sortedEdges.size(); i++)
-            {
+            for (Edge sortedEdge : sortedEdges) {
                 // lower vertice intersection
-                if (scanline == sortedEdges.get(i).p1.y)
-                {
-                    if (scanline == sortedEdges.get(i).p2.y) // horizontal edge
+                if (scanline == sortedEdge.p1.y) {
+                    if (scanline == sortedEdge.p2.y) // horizontal edge
                     {
-                        sortedEdges.get(i).off();
-                        xCrossings.add((int)sortedEdges.get(i).getX());
-                    }
-                    else
-                    {
-                        sortedEdges.get(i).on();
+                        sortedEdge.off();
+                        xCrossings.add((int) sortedEdge.getX());
+                    } else {
+                        sortedEdge.on();
                     }
                 }
 
                 // higher vertice intersection
-                if (scanline == sortedEdges.get(i).p2.y)
-                {
-                    sortedEdges.get(i).off();
-                    xCrossings.add((int)sortedEdges.get(i).getX());
+                if (scanline == sortedEdge.p2.y) {
+                    sortedEdge.off();
+                    xCrossings.add((int) sortedEdge.getX());
                 }
 
                 // intersection in the middle of the edge
-                if (scanline > sortedEdges.get(i).p1.y && scanline < sortedEdges.get(i).p2.y)
-                {
-                    sortedEdges.get(i).update();
-                    xCrossings.add((int)sortedEdges.get(i).getX());
+                if (scanline > sortedEdge.p1.y && scanline < sortedEdge.p2.y) {
+                    sortedEdge.update();
+                    xCrossings.add((int) sortedEdge.getX());
                 }
-
             }
 
             Collections.sort(xCrossings);
@@ -331,13 +324,13 @@ public class Grapher {
     }
 
     private void floodFill (Point start) {
-        if (start.isEmpty()) {
-            getFrameBuffer().setPixel(start.x, start.y, getColor());
-            floodFill(Point.at(start.x+1, start.y));
-            floodFill(Point.at(start.x-1, start.y));
-            floodFill(Point.at(start.x, start.y+1));
-            floodFill(Point.at(start.x, start.y-1));
-        }
+//        if (start.isEmpty()) {
+//            getFrameBuffer().setPixel(start.x, start.y, getColor());
+//            floodFill(Point.at(start.x+1, start.y));
+//            floodFill(Point.at(start.x-1, start.y));
+//            floodFill(Point.at(start.x, start.y+1));
+//            floodFill(Point.at(start.x, start.y-1));
+//        }
     }
 
     private void floodFillPolygon (List<Point> poly) {
