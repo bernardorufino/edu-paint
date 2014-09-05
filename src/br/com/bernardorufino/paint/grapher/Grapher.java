@@ -1,7 +1,6 @@
 package br.com.bernardorufino.paint.grapher;
 
 import br.com.bernardorufino.paint.ext.Point;
-import br.com.bernardorufino.paint.tools.Tool;
 import br.com.bernardorufino.paint.utils.DrawUtils;
 import com.google.common.base.Converter;
 import javafx.beans.property.Property;
@@ -9,6 +8,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.paint.Color;
 
 import java.util.BitSet;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -255,11 +255,22 @@ public class Grapher {
     private void floodFill (Point start) {
         if (start.isEmpty()) {
             getFrameBuffer().setPixel(start.x, start.y, getColor());
-            floodFill(Point.at(start.x+1, start.y));
+            floodFill(Point.at(start.x + 1, start.y));
             floodFill(Point.at(start.x-1, start.y));
             floodFill(Point.at(start.x, start.y+1));
             floodFill(Point.at(start.x, start.y-1));
         }
+    }
+
+    private void floodFillPolygon (List<Point> poly) {
+        Point seed = Point.at(0,0);
+        for (Point vertex : poly) {
+            seed.x += vertex.x;
+            seed.y += vertex.y;
+        }
+        seed.x /= poly.size();
+        seed.y /= poly.size();
+        floodFill(seed);
     }
 
 }
