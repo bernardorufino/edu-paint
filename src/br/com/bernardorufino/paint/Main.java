@@ -13,7 +13,7 @@ public class Main extends Application {
 
     @SuppressWarnings("ConstantConditions")
     @Override
-    public void start(Stage stage) throws Exception{
+    public void start(Stage stage) throws Exception {
         ClassLoader classLoader = getClass().getClassLoader();
 
         FXMLLoader fxmlLoader = new FXMLLoader(classLoader.getResource("window.fxml"));

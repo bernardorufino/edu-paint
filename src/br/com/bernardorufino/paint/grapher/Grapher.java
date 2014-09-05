@@ -1,13 +1,17 @@
 package br.com.bernardorufino.paint.grapher;
 
+import br.com.bernardorufino.paint.ext.Edge;
 import br.com.bernardorufino.paint.ext.Point;
+import br.com.bernardorufino.paint.ext.Polygon;
 import br.com.bernardorufino.paint.utils.DrawUtils;
 import com.google.common.base.Converter;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.paint.Color;
 
+import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -120,6 +124,10 @@ public class Grapher {
         setPatternDraw(true);
         // Calls the Bresenham algorithm with usual drawPixel function
         drawBresenhamLine(p, q, this::drawPixel);
+        return this;
+    }
+
+    public Grapher drawPolygon() {
         return this;
     }
 
@@ -245,6 +253,76 @@ public class Grapher {
             p.x += 1;
             // Draw pixel
             pixelWriter.accept(p);
+        }
+    }
+
+    public void drawPolygon (Polygon polygon) {
+        List<Point> points = polygon.getPoints();
+
+        if (points.size() < 1) return;
+
+        Point p1, p2;
+        for (int i = 0; i < points.size() - 1; i++) {
+            p1 = points.get(i);
+            p2 = points.get(i+1);
+            drawBresenhamLine(p1, p2);
+        }
+
+        Point lastPoint = points.get(points.size() - 1 );
+        Point firstPoint = points.get(0);
+
+        drawBresenhamLine(lastPoint, firstPoint);
+    }
+
+    public void scanFill (Polygon polygon) {
+        List<Edge> sortedEdges = polygon.getSortedEdges();
+
+        List<Integer> xCrossings = new ArrayList<Integer>();
+        for (int scanline = polygon.getYMin(); scanline <= polygon.getYMax(); scanline++)
+        {
+            xCrossings.clear();
+            for (int i = 0; i < sortedEdges.size(); i++)
+            {
+                // lower vertice intersection
+                if (scanline == sortedEdges.get(i).p1.y)
+                {
+                    if (scanline == sortedEdges.get(i).p2.y) // horizontal edge
+                    {
+                        sortedEdges.get(i).off();
+                        xCrossings.add((int)sortedEdges.get(i).getX());
+                    }
+                    else
+                    {
+                        sortedEdges.get(i).on();
+                    }
+                }
+
+                // higher vertice intersection
+                if (scanline == sortedEdges.get(i).p2.y)
+                {
+                    sortedEdges.get(i).off();
+                    xCrossings.add((int)sortedEdges.get(i).getX());
+                }
+
+                // intersection in the middle of the edge
+                if (scanline > sortedEdges.get(i).p1.y && scanline < sortedEdges.get(i).p2.y)
+                {
+                    sortedEdges.get(i).update();
+                    xCrossings.add((int)sortedEdges.get(i).getX());
+                }
+
+            }
+
+            Collections.sort(xCrossings);
+
+            if (xCrossings.size() < 2 || xCrossings.size() % 2 != 0) {
+                throw new RuntimeException("Houston, we have problem!");
+            }
+
+            for (int i = 0; i < xCrossings.size(); i+=2) {
+                drawBresenhamLine(Point.at(xCrossings.get(i), scanline), Point.at(xCrossings.get(i+1), scanline));
+            }
+
         }
     }
 
