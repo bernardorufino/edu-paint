@@ -1,6 +1,7 @@
 package br.com.bernardorufino.paint.grapher;
 
 import br.com.bernardorufino.paint.ext.Point;
+import br.com.bernardorufino.paint.tools.Tool;
 import br.com.bernardorufino.paint.utils.DrawUtils;
 import com.google.common.base.Converter;
 import javafx.beans.property.Property;
@@ -250,4 +251,15 @@ public class Grapher {
     public FrameBuffer getFrameBuffer() {
         return mFb;
     }
+
+    private void floodFill (Point start) {
+        if (start.isEmpty()) {
+            getFrameBuffer().setPixel(start.x, start.y, getColor());
+            floodFill(Point.at(start.x+1, start.y));
+            floodFill(Point.at(start.x-1, start.y));
+            floodFill(Point.at(start.x, start.y+1));
+            floodFill(Point.at(start.x, start.y-1));
+        }
+    }
+
 }
