@@ -19,6 +19,7 @@ public class PolygonTool extends Tool {
             mPolygon.add(getPosition(event));
         } else if (event.getButton() == MouseButton.SECONDARY) {
             mPolygon.add(getPosition(event));
+     //       mGrapher.drawPolygon(new Polygon(mPolygon));
             mGrapher.scanFill(new Polygon(mPolygon));
             // Call grapher with the points
             mPolygon.clear();

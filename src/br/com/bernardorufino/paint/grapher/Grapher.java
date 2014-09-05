@@ -257,7 +257,7 @@ public class Grapher {
     }
 
     public void drawPolygon (Polygon polygon) {
-        List<Point> points = polygon.getPoints();
+        List<Point> points = polygon.getVertices();
 
         if (points.size() < 1) return;
 
@@ -278,11 +278,12 @@ public class Grapher {
         List<Edge> sortedEdges = polygon.getSortedEdges();
 
         List<Integer> xCrossings = new ArrayList<Integer>();
+
         for (int scanline = polygon.getYMin(); scanline <= polygon.getYMax(); scanline++)
         {
             xCrossings.clear();
             for (Edge sortedEdge : sortedEdges) {
-                // lower vertice intersection
+                // lowest Y vertice intersection
                 if (scanline == sortedEdge.p1.y) {
                     if (scanline == sortedEdge.p2.y) // horizontal edge
                     {
@@ -293,7 +294,7 @@ public class Grapher {
                     }
                 }
 
-                // higher vertice intersection
+                // highest Y vertice intersection
                 if (scanline == sortedEdge.p2.y) {
                     sortedEdge.off();
                     xCrossings.add((int) sortedEdge.getX());
@@ -305,13 +306,7 @@ public class Grapher {
                     xCrossings.add((int) sortedEdge.getX());
                 }
             }
-
             Collections.sort(xCrossings);
-
-            if (xCrossings.size() < 2 || xCrossings.size() % 2 != 0) {
-                throw new RuntimeException("Houston, we have problem!");
-            }
-
             for (int i = 0; i < xCrossings.size(); i+=2) {
                 drawBresenhamLine(Point.at(xCrossings.get(i), scanline), Point.at(xCrossings.get(i+1), scanline));
             }

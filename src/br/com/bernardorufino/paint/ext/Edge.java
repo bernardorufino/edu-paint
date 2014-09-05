@@ -14,7 +14,7 @@ public class Edge {
     }
 
     public void update() {
-        x += (1/(double)m);
+        x += (1/m);
     }
 
     public void on() {

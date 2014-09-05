@@ -25,63 +25,44 @@ public class Polygon {
     }
 
     public int getYMin() {
-        int yMin = 0;
+        int yMin = mPolygon.get(0).y;
         for(Point p : mPolygon) {
-            if(p.y > yMin) {
+            if(p.y < yMin) {
                 yMin = p.y;
             }
         }
         return yMin;
     }
-/*
-    public int getXMax() {
-        int xMax = 0;
-        for(Point p : mPolygon) {
-            if(p.x > xMax) {
-                xMax = p.x;
-            }
-        }
-        return xMax;
-    }
-
-    public int getXMin() {
-        int xMin = 0;
-        for(Point p : mPolygon) {
-            if(p.x > xMin) {
-                xMin = p.x;
-            }
-        }
-        return xMin;
-    }
-
-
-    public List<Point> getXCrossings(int y) {
-        List<Point> points = new ArrayList<>();
-        int xMin, xMax;
-        xMin = getXMin();
-        xMax = getXMax();
-        for(int x = xMin; x<= xMax; x++) {
-//falta fazer
-        }
-        return points;
-    }
-
-    */
 
     public List<Edge> getSortedEdges() {
 
-        Edge[] sortedEdges = new Edge[mPolygon.size()-1];
+        Edge[] edges = new Edge[mPolygon.size()-1];
+
         for (int i = 0; i < mPolygon.size() - 1; i++)
         {
-            if (mPolygon.get(i).y < mPolygon.get(i + 1).y)
-                sortedEdges[i] = new Edge(mPolygon.get(i), mPolygon.get(i + 1));
+            if (mPolygon.get(i).y < mPolygon.get((i + 1)%(mPolygon.size()-1)).y)
+                edges[i] = new Edge(mPolygon.get(i), mPolygon.get((i + 1)%(mPolygon.size()-1)));
             else
-                sortedEdges[i] = new Edge(mPolygon.get(i + 1), mPolygon.get(i));
+                edges[i] = new Edge(mPolygon.get((i + 1)%(mPolygon.size()-1)), mPolygon.get(i));
         }
-        return Arrays.asList(sortedEdges);
+        return Arrays.asList(sortedEdges(edges));
     }
 
-    public List<Point> getPoints() {
+    private Edge[] sortedEdges(Edge[] edges) {
+        Edge tmp;
+        for (int i = 0; i < edges.length - 1; i++) {
+            for (int j = 0; j < edges.length - 1; j++) {
+                if (edges[j].p1.y > edges[j + 1].p1.y) {
+                    tmp = edges[j];
+                    edges[j] = edges[j + 1];
+                    edges[j + 1] = tmp;
+                }
+            }
+        }
+        return edges;
+    }
+
+    public List<Point> getVertices() {
         return mPolygon;
     }
 
