@@ -335,7 +335,7 @@ public class Grapher {
         return mFb;
     }
 
-    private void floodFill (Point start) {
+    public void floodFill (Point start) {
         if (getColor() != getPixelColor(start)) { // making sure that the current point is neither filled yet nor is an edge point
             getFrameBuffer().setPixel(start.x, start.y, getColor());
             floodFill(Point.at(start.x+1, start.y));
@@ -346,6 +346,8 @@ public class Grapher {
     }
 
     public void floodFillPolygon (List<Point> poly) {
+        setPatternDraw(PatternType.D2);
+        
         List<Point> triangle = new ArrayList<>();
         while (poly.size() > 3) { //run untill the  polygon is triangulated
             boolean earFound = false;
