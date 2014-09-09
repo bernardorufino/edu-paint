@@ -1,8 +1,5 @@
 package br.com.bernardorufino.paint.ext;
 
-/**
- * Created by diogosfreitas on 04/09/2014.
- */
 public class Edge {
     public Point p1, p2;
     private double x, m;

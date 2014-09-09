@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Created by diogosfreitas on 04/09/2014.
- */
 public class Polygon {
     private List<Point> mPolygon = new ArrayList<>();
 
@@ -62,9 +59,9 @@ public class Polygon {
         }
         return Arrays.asList(edges);
     }
-
+/*
     public List<Point> getVertices() {
         return mPolygon;
-    }
+    }*/
 
 }

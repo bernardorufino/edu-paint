@@ -140,10 +140,10 @@ public class Grapher {
     public Grapher drawBresenhamLine(Point p, Point q) {
         return drawBresenhamLine(p, q, PatternType.D1);
     }
-
+/*
     public Grapher drawPolygon() {
         return this;
-    }
+    }*/
 
     // Accepts the initial point, the final point and a function that is supposed to write the
     // pixel on the screen
@@ -269,7 +269,7 @@ public class Grapher {
             pixelWriter.accept(p);
         }
     }
-
+/*
     public void drawPolygon (Polygon polygon) {
         List<Point> points = polygon.getVertices();
 
@@ -286,7 +286,7 @@ public class Grapher {
         Point firstPoint = points.get(0);
 
         drawBresenhamLine(lastPoint, firstPoint);
-    }
+    }*/
 
     public void scanFill (Polygon polygon) {
         setPatternDraw(PatternType.D2);
@@ -375,7 +375,8 @@ public class Grapher {
             es.get(es.size() - 1).last = q;
             es.add(Pair.of(q, null)); /* TODO: Unchecked */
         }, (a, b) -> {});
-        edges = edges.subList(1, edges.size() - 1);
+        edges = edges.subList(1, edges.size());
+        edges.get(edges.size() - 1).last = polygon.get(0);
         return edges.stream()
                 .filter(e -> Math.max(e.first.x, e.last.x) > p.x)
                 .filter(e -> Math.min(e.first.y, e.last.y) < p.y && p.y < Math.max(e.first.y, e.last.y))

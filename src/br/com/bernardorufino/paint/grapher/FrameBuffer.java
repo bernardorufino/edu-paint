@@ -10,8 +10,6 @@ import javafx.scene.paint.Color;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.google.common.base.Preconditions.checkState;
-
 public class FrameBuffer {
 
     public static FrameBuffer empty(GraphicsContext gc, int resizeFactor) {
@@ -53,13 +51,13 @@ public class FrameBuffer {
         mModifiedPoints = new HashSet<>();
         return this;
     }
-
+/*
     public FrameBuffer commit() {
         mRecoverableMode = false;
         mSavedState = save();
         mModifiedPoints = new HashSet<>();
         return this;
-    }
+    }*/
 
     public FrameBuffer rollback() {
         mRecoverableMode = false;
@@ -87,20 +85,20 @@ public class FrameBuffer {
     public boolean contains(Point p) {
         return 0 <= p.x && p.x < mFb.length && 0 <= p.y && p.y < mFb[0].length;
     }
-
+/*
     public Point nearestValid(Point p) {
         int w = mFb.length - 1;
         int h = mFb[0].length - 1;
         return Point.at(Math.max(0, Math.min(w, p.x)), Math.max(0, Math.min(h, p.y)));
-    }
-
+    }*/
+/*
     public FrameBuffer restore(State state) {
         checkState(!mRecoverableMode, "Cannot restore in recoverable mode");
         Matrices.forEach(mFb, (i, j, value) -> {
             setPixel(i, j, state.mFb[i][j]);
         });
         return this;
-    }
+    }*/
 
     public State save() {
         return new State(mFb);
