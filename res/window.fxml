@@ -92,7 +92,7 @@
             <Insets bottom="6.0" left="8.0" right="8.0" top="6.0" />
          </padding>
          <children>
-            <Button focusTraversable="false" mnemonicParsing="false" onAction="#onCleanButtonClick" text="Clean" />
+            <Button fx:id="vCleanButton" focusTraversable="false" mnemonicParsing="false" onAction="#onCleanButtonClick" text="Clean" />
             <Separator focusTraversable="false" visible="false" HBox.hgrow="ALWAYS" />
             <ChoiceBox fx:id="vPattern2d" focusTraversable="false">
                <opaqueInsets>

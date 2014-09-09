@@ -15,7 +15,9 @@ public abstract class TwoStepDrawingTool extends Tool {
             mFb.rollback();
             draw(mFirstPoint, getPosition(event), event);
             mDrawing = false;
+            notifyFinishUseListener();
         } else {
+            notifyStartUseListener();
             mFirstPoint = getPosition(event);
             mFb.begin();
             mGrapher.drawPixel(mFirstPoint);

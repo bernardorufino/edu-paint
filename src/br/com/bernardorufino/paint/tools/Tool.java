@@ -13,6 +13,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 
 import java.util.BitSet;
+import java.util.function.Consumer;
 
 public abstract class Tool {
 
@@ -23,6 +24,8 @@ public abstract class Tool {
     private Property<Color> mColorProperty = new SimpleObjectProperty<>();
     private Property<BitSet> mPatternProperty = new SimpleObjectProperty<>();
     private int mResizeFactor;
+    private Consumer<Tool> mOnStartUseListener;
+    private Consumer<Tool> mOnFinishUseListener;
 
     public Tool bind(Grapher grapher, Label status, int resizeFactor) {
         vStatus = status;
@@ -78,5 +81,21 @@ public abstract class Tool {
 
     protected Point getPosition(MouseEvent event) {
         return getPosition(event.getX(), event.getY());
+    }
+
+    public void setOnStartUseListener(Consumer<Tool> listener) {
+        mOnStartUseListener = listener;
+    }
+
+    public void setOnFinishUseListener(Consumer<Tool> listener) {
+        mOnFinishUseListener = listener;
+    }
+
+    protected void notifyStartUseListener() {
+        mOnStartUseListener.accept(this);
+    }
+
+    protected void notifyFinishUseListener() {
+        mOnFinishUseListener.accept(this);
     }
 }

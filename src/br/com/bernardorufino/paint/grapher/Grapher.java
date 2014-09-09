@@ -345,8 +345,7 @@ public class Grapher {
             Point p = stack.pop();
             drawPixel(p);
             for (Point q : ImmutableList.of(p.plusX(1), p.plusX(-1), p.plusY(1), p.plusY(-1))) {
-                if (getColor() == getPixelColor(q)) continue;
-                if (visiteds.contains(q)) continue;
+                if (!mFb.contains(q) || getColor() == getPixelColor(q) || visiteds.contains(q)) continue;
                 stack.add(q);
                 visiteds.add(q);
             }

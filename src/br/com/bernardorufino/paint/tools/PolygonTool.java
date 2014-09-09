@@ -17,6 +17,7 @@ public abstract class PolygonTool extends Tool {
         if (event.getButton() == MouseButton.PRIMARY) {
             Point p = getPosition(event);
             if (mPolygon.isEmpty()) {
+                notifyStartUseListener();
                 mGrapher.drawPixel(p);
             } else {
                 Point q = mPolygon.get(mPolygon.size() - 1);
@@ -24,7 +25,9 @@ public abstract class PolygonTool extends Tool {
             }
             mPolygon.add(p);
         } else if (event.getButton() == MouseButton.SECONDARY) {
-            if (mPolygon.size() < 2) {
+            notifyFinishUseListener();
+            if (mPolygon.size() <= 2) {
+                mPolygon.clear();
                 return;
             }
             Point q = mPolygon.get(mPolygon.size() - 1);

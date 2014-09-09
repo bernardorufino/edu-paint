@@ -80,6 +80,7 @@ public class WindowController extends ContextAwareController implements Initiali
     @FXML public ColorPicker vForegroundColorPicker;
     @FXML public ChoiceBox<PatternChoice> vPattern;
     @FXML public ChoiceBox<Pattern2dChoice> vPattern2d;
+    @FXML public Button vCleanButton;
 
     private GraphicsContext mGc;
     private Tool mNopTool;
@@ -125,6 +126,8 @@ public class WindowController extends ContextAwareController implements Initiali
         tools.forEach((button, tool) -> {
             mTools.add(tool);
             tool.bind(mGrapher, vStatus, RESIZE_FACTOR);
+            tool.setOnStartUseListener(t -> vCleanButton.setDisable(true));
+            tool.setOnFinishUseListener(t -> vCleanButton.setDisable(false));
             button.setUserData(tool);
         });
         mNopTool = NOP_TOOL.bind(mGrapher, vStatus, RESIZE_FACTOR);
