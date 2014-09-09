@@ -8,10 +8,7 @@ import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.paint.Color;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -339,27 +336,29 @@ public class Grapher {
     }
 
     private void floodFill (Point start) {
-//        if (start.isEmpty()) { // making sure that the current point is neither filled yet nor is an edge point
-//            getFrameBuffer().setPixel(start.x, start.y, getColor());
-//            floodFill(Point.at(start.x+1, start.y));
-//            floodFill(Point.at(start.x-1, start.y));
-//            floodFill(Point.at(start.x, start.y+1));
-//            floodFill(Point.at(start.x, start.y-1));
-//        }
+        if (getColor() != getPixelColor(start)) { // making sure that the current point is neither filled yet nor is an edge point
+            getFrameBuffer().setPixel(start.x, start.y, getColor());
+            floodFill(Point.at(start.x+1, start.y));
+            floodFill(Point.at(start.x-1, start.y));
+            floodFill(Point.at(start.x, start.y+1));
+            floodFill(Point.at(start.x, start.y-1));
+        }
     }
 
-    private void floodFillPolygon (List<Point> poly) {
+    public void floodFillPolygon (List<Point> poly) {
         List<Point> triangle = new ArrayList<>();
         while (poly.size() > 3) { //run untill the  polygon is triangulated
             boolean earFound = false;
-            int i = poly.size(); // starts with the last vertex
+            int i = poly.size()-1; // starts with the last vertex
             while (!earFound) {
-                Point mediumPoint = poly.get(i-1).plus(poly.get((i+1)%poly.size())).times(0.5);
+                Point mediumPoint = poly.get((i-1)%poly.size()).plus(poly.get((i+1)%poly.size())).times(0.5);
                 if (isInsidePolygon(poly, mediumPoint)) { // check if vertex i makes an ear
                     triangle.add(poly.get(i));
-                    triangle.add(poly.get(i-1));
+                    triangle.add(poly.get((i-1)%poly.size()));
                     triangle.add(poly.get((i+1)%poly.size()));
+                    drawBresenhamLine(triangle.get(1),triangle.get(2));
                     floodFillTriangulatedPolygon(triangle); // fill the triangle just created
+                    triangle.clear();
                     poly.remove(i); // remove the ear
                     earFound = true;
                 }
@@ -371,7 +370,7 @@ public class Grapher {
         floodFillTriangulatedPolygon(poly); // fill the last triangle
     }
 
-    private boolean isInsidePolygon(List<Point> polygon, Point p) {
+    private static boolean isInsidePolygon(List<Point> polygon, Point p) {
         List<Pair<Point, Point>> edges = polygon.stream().collect(() -> Lists.newArrayList(Pair.of(null, null)), (ArrayList<Pair<Point, Point>> es, Point q) -> {
             es.get(es.size() - 1).last = q;
             es.add(Pair.of(q, null)); /* TODO: Unchecked */
@@ -384,7 +383,7 @@ public class Grapher {
     }
 
     private void floodFillTriangulatedPolygon (List<Point> poly) {
-        Point seed = Point.at(0,0);
+        Point seed = Point.at(0, 0);
         for (Point vertex : poly) {
             seed.x += vertex.x;
             seed.y += vertex.y;
