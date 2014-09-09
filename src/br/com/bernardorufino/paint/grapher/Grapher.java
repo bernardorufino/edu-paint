@@ -3,6 +3,7 @@ package br.com.bernardorufino.paint.grapher;
 import br.com.bernardorufino.paint.ext.*;
 import br.com.bernardorufino.paint.utils.DrawUtils;
 import com.google.common.base.Converter;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
@@ -336,12 +337,19 @@ public class Grapher {
     }
 
     public void floodFill (Point start) {
-        if (getColor() != getPixelColor(start)) { // making sure that the current point is neither filled yet nor is an edge point
-            getFrameBuffer().setPixel(start.x, start.y, getColor());
-            floodFill(Point.at(start.x+1, start.y));
-            floodFill(Point.at(start.x-1, start.y));
-            floodFill(Point.at(start.x, start.y+1));
-            floodFill(Point.at(start.x, start.y-1));
+        Set<Point> visiteds = new HashSet<>();
+        Stack<Point> stack = new Stack<>();
+        stack.add(start);
+        visiteds.add(start);
+        while (!stack.isEmpty()) {
+            Point p = stack.pop();
+            drawPixel(p);
+            for (Point q : ImmutableList.of(p.plusX(1), p.plusX(-1), p.plusY(1), p.plusY(-1))) {
+                if (getColor() == getPixelColor(q)) continue;
+                if (visiteds.contains(q)) continue;
+                stack.add(q);
+                visiteds.add(q);
+            }
         }
     }
 
@@ -358,7 +366,7 @@ public class Grapher {
                     triangle.add(poly.get(i));
                     triangle.add(poly.get((i-1)%poly.size()));
                     triangle.add(poly.get((i+1)%poly.size()));
-                    drawBresenhamLine(triangle.get(1),triangle.get(2));
+                    drawBresenhamLine(triangle.get(1), triangle.get(2));
                     floodFillTriangulatedPolygon(triangle); // fill the triangle just created
                     triangle.clear();
                     poly.remove(i); // remove the ear

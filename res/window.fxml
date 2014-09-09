@@ -79,6 +79,7 @@
             <ToggleButton fx:id="vFreeTool" focusTraversable="false" mnemonicParsing="false" styleClass="last" text="Free" toggleGroup="$mToolToggle" />
             <ToggleButton fx:id="vScanLineTool" focusTraversable="false" mnemonicParsing="false" text="ScanLine" toggleGroup="$mToolToggle" />
             <ToggleButton fx:id="vFloodFillTool" focusTraversable="false" mnemonicParsing="false" text="FloodFill" toggleGroup="$mToolToggle" />
+            <ToggleButton fx:id="vCircleFill" focusTraversable="false" mnemonicParsing="false" text="CircleFill" toggleGroup="$mToolToggle" />
          </children>
       </HBox>
       <StackPane styleClass="canvas-pane" GridPane.columnIndex="1" GridPane.rowIndex="3">

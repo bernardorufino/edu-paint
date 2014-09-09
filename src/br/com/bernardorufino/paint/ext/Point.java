@@ -46,6 +46,14 @@ public class Point {
         return Point.at(x + p.x, y + p.y);
     }
 
+    public Point plusX(int dx) {
+        return Point.at(x + dx, y);
+    }
+
+    public Point plusY(int dy) {
+        return Point.at(x, y + dy);
+    }
+
     public double distanceTo(Point p) {
         return this.minus(p).norm();
     }
