@@ -85,7 +85,7 @@
       </HBox>
       <StackPane styleClass="canvas-pane" GridPane.columnIndex="1" GridPane.rowIndex="3">
          <children>
-            <Canvas fx:id="vCanvas" height="448.0" styleClass="canvas" width="448.0" />
+            <Canvas fx:id="vCanvas" height="448.0" styleClass="canvas" width="640.0" />
          </children>
       </StackPane>
       <HBox alignment="TOP_CENTER" styleClass="tool-bar" GridPane.columnIndex="1" GridPane.rowIndex="2">

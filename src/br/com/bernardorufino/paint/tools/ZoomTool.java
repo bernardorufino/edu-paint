@@ -2,10 +2,14 @@ package br.com.bernardorufino.paint.tools;
 
 import br.com.bernardorufino.paint.ext.Matrix;
 import br.com.bernardorufino.paint.ext.Point;
+import br.com.bernardorufino.paint.ext.Polygon;
 import br.com.bernardorufino.paint.grapher.FrameBuffer;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by diogosfreitas on 03/10/2014.
@@ -19,24 +23,38 @@ public class ZoomTool extends Tool {
     public void onMouseClicked(MouseEvent event) {
         super.onMousePressed(event);
         if (mZooming) {
+            mFb.rollback();
             zoom(mFirstPoint, getPosition(event), event);
             mZooming = false;
             notifyFinishUseListener();
         } else {
             notifyStartUseListener();
             mFirstPoint = getPosition(event);
+            mFb.begin();
+            mGrapher.drawPixel(mFirstPoint);
             mZooming = true;
         }
     }
 
-    protected void zoom(Point p, Point q, MouseEvent event) {
-        FrameBuffer fb = mGrapher.getFrameBuffer();
-        GraphicsContext gc = fb.getGraphicsContext();
-        Canvas canvas = gc.getCanvas();
+    @Override
+    public void onMouseMoved(MouseEvent event) {
+        super.onMouseMoved(event);
+        if (mZooming) {
+            mFb.rollback().begin();
+            draw(mFirstPoint, getPosition(event), event);
+        }
+    }
 
-        fb.setWindow(p.x, p.y, q.x, q.y);
-        Matrix transformation = Matrix.identity();
-        //canvas.setWidth(Math.abs(p.x - q.x));
-        //canvas.setHeight(Math.abs(p.y - q.y));
+    protected void draw(Point p, Point q, MouseEvent event) {
+        List<Point> vertices = new ArrayList<Point>();
+        vertices.add(p);
+        vertices.add(Point.at(q.x, p.y));
+        vertices.add(q);
+        vertices.add(Point.at(p.x, q.y));
+        Polygon rectangle = new Polygon(vertices);
+        mGrapher.drawPolygon(rectangle);
+    }
+    protected void zoom(Point p, Point q, MouseEvent event) {
+        mGrapher.applyZoom(p, q);
     }
 }

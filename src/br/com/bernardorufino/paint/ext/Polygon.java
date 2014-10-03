@@ -5,15 +5,15 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Polygon {
-    private List<Point> mPolygon = new ArrayList<>();
+    private List<Point> mVertices = new ArrayList<>();
 
     public Polygon(List<? extends Point> vertices) {
-        mPolygon.addAll(vertices);
+        mVertices.addAll(vertices);
     }
 
     public int getYMax() {
         int yMax = 0;
-        for(Point p : mPolygon) {
+        for(Point p : mVertices) {
             if(p.y > yMax) {
                 yMax = p.y;
             }
@@ -22,8 +22,8 @@ public class Polygon {
     }
 
     public int getYMin() {
-        int yMin = mPolygon.get(0).y;
-        for(Point p : mPolygon) {
+        int yMin = mVertices.get(0).y;
+        for(Point p : mVertices) {
             if(p.y < yMin) {
                 yMin = p.y;
             }
@@ -32,15 +32,14 @@ public class Polygon {
     }
 
     public Edge[] getEdges() {
+        Edge[] edges = new Edge[mVertices.size()];
 
-        Edge[] edges = new Edge[mPolygon.size()];
-
-        for (int i = 0; i < mPolygon.size(); i++)
+        for (int i = 0; i < mVertices.size(); i++)
         {
-            if (mPolygon.get(i).y < mPolygon.get((i + 1)%(mPolygon.size())).y)
-                edges[i] = new Edge(mPolygon.get(i), mPolygon.get((i + 1)%(mPolygon.size())));
+            if (mVertices.get(i).y < mVertices.get((i + 1)%(mVertices.size())).y)
+                edges[i] = new Edge(mVertices.get(i), mVertices.get((i + 1)%(mVertices.size())));
             else
-                edges[i] = new Edge(mPolygon.get((i + 1)%(mPolygon.size())), mPolygon.get(i));
+                edges[i] = new Edge(mVertices.get((i + 1)%(mVertices.size())), mVertices.get(i));
         }
         return edges;
     }
@@ -59,9 +58,9 @@ public class Polygon {
         }
         return Arrays.asList(edges);
     }
-/*
+
     public List<Point> getVertices() {
-        return mPolygon;
-    }*/
+        return mVertices;
+    }
 
 }

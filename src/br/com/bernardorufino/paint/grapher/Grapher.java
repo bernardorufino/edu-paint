@@ -7,6 +7,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 import java.util.*;
@@ -270,7 +272,7 @@ public class Grapher {
             pixelWriter.accept(p);
         }
     }
-/*
+
     public void drawPolygon (Polygon polygon) {
         List<Point> points = polygon.getVertices();
 
@@ -287,7 +289,7 @@ public class Grapher {
         Point firstPoint = points.get(0);
 
         drawBresenhamLine(lastPoint, firstPoint);
-    }*/
+    }
 
     public void scanFill (Polygon polygon) {
         setPatternDraw(PatternType.D2);
@@ -402,6 +404,50 @@ public class Grapher {
         seed.y /= poly.size();
 
         floodFill(seed);
+    }
+
+    public void applyZoom(Point p, Point q) {
+
+        LineClipping lc = new LineClipping();
+        lc.setWindow(Point.at(100,100), Point.at(200,200));
+
+        List<Point> vertices = new ArrayList<Point>();
+        vertices.add(Point.at(150, 150));
+        vertices.add(Point.at(210, 150));
+        vertices.add(Point.at(150, 210));
+        vertices.add(Point.at(90, 150));
+        vertices.add(Point.at(110, 110));
+        Polygon velho = new Polygon(vertices);
+        Polygon novo = lc.clipPolygon(velho);
+
+        System.out.println(novo.toString());
+        System.out.println(velho.toString());
+        drawPolygon(velho);
+        drawPolygon(novo);
+
+        FrameBuffer fb = getFrameBuffer();
+
+        int width = fb.getWidth();
+        int height = fb.getHeight();
+
+        double xc = (p.x + q.x) / 2.0;
+        double yc = (p.y + q.y) / 2.0;
+
+        double sx = (double) width/Math.abs(p.x - q.x);
+        double sy = (double) height/Math.abs(p.y - q.y);
+
+        double s = Math.min(sx, sy);
+
+        Matrix M = new Matrix();
+        M.identity();
+        M.translate(-xc, -yc);
+        M.scale(s);
+        M.translate(width/2, height/2);
+
+
+        //Point newP = M.doTransformation(p);
+        //Point newQ = M.doTransformation(q);
+        //DrawFigures();
     }
 
     private static enum PatternType { D1, D2, NONE }
