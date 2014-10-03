@@ -395,6 +395,23 @@ public class Grapher {
                 .count() % 2 == 1;
     }
 
+    private static boolean isInsideCircle(Point center, double radius, Point p) {
+        return (p.distanceTo(center) <= radius);
+    }
+
+    private static boolean isInsideLine(Point a, Point b, Point p) {
+        if ((p.x > a.x && p.x < b.x) || (p.x > b.x && p.x < a.x)) {
+            if ((p.y > a.y && p.y < b.y) || (p.y > b.y && p.y < a.y)) {
+                float slope = (a.y - b.y) / (a.x - b.x);
+                float yIntercept = a.y - (slope * a.x);
+                return Math.abs(p.y - (slope * p.x + yIntercept)) < 0.01;
+
+            }
+            return false;
+        }
+        return false;
+    }
+
     //fills a triangle resulting from the ear clipping algorithm
     private void floodFillTriangulatedPolygon (List<Point> poly) {
         Point seed = Point.at(0, 0);
