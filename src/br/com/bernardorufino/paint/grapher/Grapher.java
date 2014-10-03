@@ -360,11 +360,11 @@ public class Grapher {
             boolean earFound = false;
             int i = poly.size()-1; // starts with the last vertex
             while (!earFound) {
-                Point mediumPoint = poly.get((i-1)%poly.size()).plus(poly.get((i+1)%poly.size())).times(0.5);
+                Point mediumPoint = poly.get(((i-1)%poly.size()+poly.size())%poly.size()).plus(poly.get(((i+1)%poly.size()+poly.size())%poly.size())).times(0.5);
                 if (isInsidePolygon(poly, mediumPoint)) { // check if vertex i makes an ear
                     triangle.add(poly.get(i));
-                    triangle.add(poly.get((i-1)%poly.size()));
-                    triangle.add(poly.get((i+1)%poly.size()));
+                    triangle.add(poly.get(((i-1)%poly.size()+poly.size())%poly.size()));
+                    triangle.add(poly.get(((i+1)%poly.size()+poly.size())%poly.size()));
                     drawBresenhamLine(triangle.get(1), triangle.get(2));
                     floodFillTriangulatedPolygon(triangle); // fill the triangle just created
                     triangle.clear();
