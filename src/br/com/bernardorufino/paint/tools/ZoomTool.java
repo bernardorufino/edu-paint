@@ -10,7 +10,7 @@ import javafx.scene.input.MouseEvent;
 /**
  * Created by diogosfreitas on 03/10/2014.
  */
-public class ZoomTool extends Tool {
+public class ZoomTool extends TwoStepDrawingTool {
 
     private boolean mZooming;
     private Point mFirstPoint;
@@ -27,6 +27,11 @@ public class ZoomTool extends Tool {
             mFirstPoint = getPosition(event);
             mZooming = true;
         }
+    }
+
+    @Override
+    protected void draw(Point p, Point q, MouseEvent event) {
+
     }
 
     protected void zoom(Point p, Point q, MouseEvent event) {

@@ -1,10 +1,10 @@
 package br.com.bernardorufino.paint.ext;
 
-public class Point {
-/*
+public class Point implements Persistable {
+
     public static Point origin() {
         return Point.at(0, 0);
-    }*/
+    }
 
     public static Point at(double x, double y) {
         return new Point((int) x, (int) y);
@@ -20,6 +20,17 @@ public class Point {
     private Point(int x, int y) {
         this.x = x;
         this.y = y;
+    }
+
+    private Point(Pack in) {
+        x = in.readInt();
+        y = in.readInt();
+    }
+
+    @Override
+    public void persist(Pack out) {
+        out.writeInt(x);
+        out.writeInt(y);
     }
 
     public Point transpose() {
@@ -87,5 +98,12 @@ public class Point {
     public String toString() {
         return String.format("(%d, %d)", x, y);
     }
+
+    public static final Creator<Point> CREATOR = new Creator<Point>() {
+        @Override
+        public Point create(Pack in) {
+            return new Point(in);
+        }
+    };
 }
 

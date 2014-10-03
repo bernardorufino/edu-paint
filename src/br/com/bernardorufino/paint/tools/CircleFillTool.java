@@ -2,6 +2,7 @@ package br.com.bernardorufino.paint.tools;
 
 import br.com.bernardorufino.paint.ext.Point;
 import br.com.bernardorufino.paint.ext.Points;
+import br.com.bernardorufino.paint.figures.CircleFigure;
 import javafx.scene.input.MouseEvent;
 
 public class CircleFillTool extends TwoStepDrawingTool {
@@ -28,7 +29,7 @@ public class CircleFillTool extends TwoStepDrawingTool {
             c = p;
             r = Points.distance(p, q);
         }
-        mGrapher.drawCircle(c, r);
-        mGrapher.floodFill(c);
+        CircleFigure circle = mGrapher.circleFill(c, r);
+        setPersistableFigure(circle);
     }
 }

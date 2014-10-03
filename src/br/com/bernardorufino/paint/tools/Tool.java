@@ -1,6 +1,7 @@
 package br.com.bernardorufino.paint.tools;
 
 import br.com.bernardorufino.paint.ext.Point;
+import br.com.bernardorufino.paint.figures.PersistableFigure;
 import br.com.bernardorufino.paint.grapher.FrameBuffer;
 import br.com.bernardorufino.paint.grapher.Grapher;
 import br.com.bernardorufino.paint.ui.WindowController;
@@ -12,7 +13,9 @@ import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 
+import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.List;
 import java.util.function.Consumer;
 
 public abstract class Tool {
@@ -26,6 +29,7 @@ public abstract class Tool {
     private int mResizeFactor;
     private Consumer<Tool> mOnStartUseListener;
     private Consumer<Tool> mOnFinishUseListener;
+    private List<PersistableFigure> mPersistableFigures = new ArrayList<>();
 
     public Tool bind(Grapher grapher, Label status, int resizeFactor) {
         vStatus = status;
@@ -79,6 +83,19 @@ public abstract class Tool {
         return Point.at(i, j);
     }
 
+    protected void addPersistableFigure(PersistableFigure figure) {
+        mPersistableFigures.add(figure);
+    }
+
+    protected void setPersistableFigure(PersistableFigure figure) {
+        mPersistableFigures.clear();
+        mPersistableFigures.add(figure);
+    }
+
+    public List<PersistableFigure> getPersistableFigures() {
+        return mPersistableFigures;
+    }
+
     protected Point getPosition(MouseEvent event) {
         return getPosition(event.getX(), event.getY());
     }
@@ -92,7 +109,12 @@ public abstract class Tool {
     }
 
     protected void notifyStartUseListener() {
+        onStartUse();
         mOnStartUseListener.accept(this);
+    }
+
+    protected void onStartUse() {
+        mPersistableFigures.clear();
     }
 
     protected void notifyFinishUseListener() {

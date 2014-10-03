@@ -1,14 +1,15 @@
 package br.com.bernardorufino.paint.ui;
 
-import br.com.bernardorufino.paint.ext.BitMatrix;
-import br.com.bernardorufino.paint.ext.ContextAwareController;
+import br.com.bernardorufino.paint.ext.*;
 import br.com.bernardorufino.paint.ext.Properties;
+import br.com.bernardorufino.paint.figures.PersistableFigure;
 import br.com.bernardorufino.paint.grapher.FrameBuffer;
 import br.com.bernardorufino.paint.grapher.Grapher;
 import br.com.bernardorufino.paint.tools.*;
 import br.com.bernardorufino.paint.utils.DrawUtils;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.io.Files;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -17,8 +18,14 @@ import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
@@ -82,12 +89,14 @@ public class WindowController extends ContextAwareController implements Initiali
     @FXML public ChoiceBox<PatternChoice> vPattern;
     @FXML public ChoiceBox<Pattern2dChoice> vPattern2d;
     @FXML public Button vCleanButton;
+    @FXML public ToggleButton vSelectButton;
 
     private GraphicsContext mGc;
     private Tool mNopTool;
     private FrameBuffer mFb;
     private Grapher mGrapher;
     private List<Tool> mTools;
+    private List<PersistableFigure> mFigures = new ArrayList<>();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -122,13 +131,17 @@ public class WindowController extends ContextAwareController implements Initiali
                 .put(vScanLineTool, new ScanLineTool())
                 .put(vCircleFill, new CircleFillTool())
                 .put(vZoomTool, new ZoomTool())
+                .put(vSelectButton, new SelectTool())
                 .build();
         mTools = new ArrayList<>(tools.size());
         tools.forEach((button, tool) -> {
             mTools.add(tool);
             tool.bind(mGrapher, vStatus, RESIZE_FACTOR);
             tool.setOnStartUseListener(t -> vCleanButton.setDisable(true));
-            tool.setOnFinishUseListener(t -> vCleanButton.setDisable(false));
+            tool.setOnFinishUseListener(t -> {
+                vCleanButton.setDisable(false);
+                mFigures.addAll(t.getPersistableFigures());
+            });
             button.setUserData(tool);
         });
         mNopTool = NOP_TOOL.bind(mGrapher, vStatus, RESIZE_FACTOR);
@@ -164,7 +177,70 @@ public class WindowController extends ContextAwareController implements Initiali
     }
 
     public void onCleanButtonClick(ActionEvent event) {
+        mFigures.clear();
         mFb.clean();
+    }
+
+    public void onOpenMenuClick(ActionEvent event) {
+        File file = new FileChooser().showOpenDialog(getStage());
+        if (file != null) {
+            try {
+                byte[] bytes = Files.toByteArray(file);
+                Pack pack = Pack.readOnly(bytes);
+                ImmutableList<PersistableFigure> figures = pack.<PersistableFigure>readPersistables();
+                resetFigures(figures);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void resetFigures(Iterable<? extends PersistableFigure> figures) {
+        mFigures.clear();
+        mFb.clean();
+        for (PersistableFigure figure : figures) {
+            figure.draw(mGrapher);
+            mFigures.add(figure);
+        }
+    }
+
+    public void onSaveMenuClick(ActionEvent event) {
+        Pack pack = Pack.writable();
+        pack.writePersistables(mFigures);
+        byte[] bytes = pack.toByteArray();
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialFileName("draw.bmd");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Compatible images (bmd)", "*.bmd"));
+        fileChooser.setTitle("Save Draw");
+        File file = fileChooser.showSaveDialog(getStage());
+        if (file != null) {
+            try {
+                BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(file));
+                out.write(bytes);
+                out.flush();
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private class SelectTool extends Tool {
+
+        @Override
+        public void onMouseClicked(MouseEvent event) {
+            Point p = getPosition(event);
+            PersistableFigure toDelete = null;
+            for (PersistableFigure figure : mFigures) {
+                if (figure.isSelected(p)) {
+                    toDelete = figure;
+                    break;
+                }
+            }
+            mFigures.remove(toDelete);
+            resetFigures(new ArrayList<>(mFigures));
+        }
     }
 
     public static class PatternChoice {

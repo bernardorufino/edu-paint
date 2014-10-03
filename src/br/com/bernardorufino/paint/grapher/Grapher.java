@@ -1,6 +1,13 @@
 package br.com.bernardorufino.paint.grapher;
 
-import br.com.bernardorufino.paint.ext.*;
+import br.com.bernardorufino.paint.ext.BitMatrix;
+import br.com.bernardorufino.paint.ext.Edge;
+import br.com.bernardorufino.paint.ext.Pair;
+import br.com.bernardorufino.paint.ext.Point;
+import br.com.bernardorufino.paint.figures.CircleFigure;
+import br.com.bernardorufino.paint.figures.LineFigure;
+import br.com.bernardorufino.paint.figures.Polygon;
+import br.com.bernardorufino.paint.figures.PolygonFigure;
 import br.com.bernardorufino.paint.utils.DrawUtils;
 import com.google.common.base.Converter;
 import com.google.common.collect.ImmutableList;
@@ -21,6 +28,7 @@ public class Grapher {
     private final FrameBuffer mFb;
     private PatternType mPatternDraw = PatternType.NONE;
     private int mPixelCount;
+    private Configuration mTemporaryConfiguration;
 
     public Grapher(FrameBuffer fb) {
         mFb = fb;
@@ -28,10 +36,6 @@ public class Grapher {
 
     public Property<Color> colorProperty() {
         return mColorProperty;
-    }
-
-    private int getColor() {
-        return DrawUtils.fromColorToInt(mColorProperty.getValue());
     }
 
     public Property<BitSet> patternProperty() {
@@ -45,16 +49,42 @@ public class Grapher {
     private boolean showPixelAndAdjustPattern(Point p) {
         switch (mPatternDraw) {
             case D1:
-                BitSet pattern = mPatternProperty.getValue();
+                BitSet pattern = getPattern();
                 int bit = (mPixelCount++) % pattern.length();
                 return pattern.get(bit);
             case D2:
-                BitMatrix pattern2d = mPattern2dProperty.getValue();
+                BitMatrix pattern2d = getPattern2d();
                 return pattern2d.get(p.y % pattern2d.getRows(), p.x % pattern2d.getColumns());
             case NONE:
                 return true;
         }
         throw new AssertionError();
+    }
+
+    private int getColor() {
+        return (mTemporaryConfiguration != null) ? mTemporaryConfiguration.color : DrawUtils.fromColorToInt(mColorProperty.getValue());
+    }
+
+    private BitMatrix getPattern2d() {
+        return (mTemporaryConfiguration != null) ? mTemporaryConfiguration.pattern2d : mPattern2dProperty.getValue();
+    }
+
+    private BitSet getPattern() {
+        return (mTemporaryConfiguration != null) ? mTemporaryConfiguration.pattern : mPatternProperty.getValue();
+    }
+
+    public Grapher temporarilyWith(Configuration configuration) {
+        mTemporaryConfiguration = configuration;
+        return this;
+    }
+
+    public void execute(Consumer<Grapher> consumer) {
+        consumer.accept(this);
+        mTemporaryConfiguration = null;
+    }
+
+    public Configuration getConfiguration() {
+        return new Configuration(getPattern2d(), getPattern(), getColor());
     }
 
     // In order to draw with patterns one should make sure pixels are painted in order on the screen
@@ -90,14 +120,14 @@ public class Grapher {
 
     // Accepts the initial point p, final point q and a function which is supposed to
     // write the pixel on screen.
-    private void drawDdaLine(Point p, Point q, Consumer<? super Point> pixelWriter) {
+    private LineFigure drawDdaLine(Point p, Point q, Consumer<? super Point> pixelWriter) {
         // Sets the length as the greatest difference of coordinates, in order not to
         // skip pixels. Practically we invert x and y in case the angular coefficient of
         // the line is greater than 1
         int length = Math.max(Math.abs(q.x - p.x), Math.abs(q.y - p.y));
         if (length == 0) {
             pixelWriter.accept(p);
-            return;
+            return null;
         }
         // Calculate increments base on length, they can be 1, -1, m, -m, 1/m or -1/m
         double dx = (double) (q.x - p.x) / length;
@@ -113,6 +143,7 @@ public class Grapher {
             x += dx;
             y += dy;
         }
+        return new LineFigure(p, q, getConfiguration());
     }
 
     public Grapher drawXorLine(Point p, Point q) {
@@ -121,13 +152,13 @@ public class Grapher {
         return this;
     }
 
-    public Grapher drawDdaLine(Point p, Point q) {
+    public LineFigure drawDdaLine(Point p, Point q) {
         // Activates the drawing of patterns in order to keep track of which pixels to
         // write on the screen
         setPatternDraw(PatternType.D1);
         // Calls the DDA algorithm with drawPixel function
         drawDdaLine(p, q, this::drawPixel);
-        return this;
+        return new LineFigure(p, q, getConfiguration());
     }
 
     public Grapher drawBresenhamLine(Point p, Point q, PatternType patternType) {
@@ -138,8 +169,9 @@ public class Grapher {
         return this;
     }
 
-    public Grapher drawBresenhamLine(Point p, Point q) {
-        return drawBresenhamLine(p, q, PatternType.D1);
+    public LineFigure drawBresenhamLine(Point p, Point q) {
+        drawBresenhamLine(p, q, PatternType.D1);
+        return new LineFigure(p, q, getConfiguration());
     }
 /*
     public Grapher drawPolygon() {
@@ -210,7 +242,7 @@ public class Grapher {
         throw new AssertionError("Position p didn't fit any octant.");
     }
 
-    public Grapher drawCircle(Point c, double radius) {
+    public CircleFigure drawCircle(Point c, double radius) {
         // Activates the drawing of patterns
         setPatternDraw(PatternType.NONE);
         // Draw the different eights of the circumference in order so as to display the pattern properly
@@ -231,11 +263,11 @@ public class Grapher {
         drawEighthCircle(c, radius, p -> drawCircPixel(false, pxCount, p.minus(c).flipY().transpose().plus(c)));
         pxCount.set(pxCount.get() + count);
         drawEighthCircle(c, radius, p -> drawCircPixel(true, pxCount, p.minus(c).flipY().plus(c)));
-        return this;
+        return new CircleFigure(c, radius, false, getConfiguration());
     }
 
     private void drawCircPixel(boolean reverse, AtomicInteger count, Point p) {
-        BitSet pattern = patternProperty().getValue();
+        BitSet pattern = getPattern();
         int pos = count.get() % pattern.length();
         if (pattern.get(pos)) {
             safeDrawPixel(p);
@@ -272,39 +304,43 @@ public class Grapher {
             pixelWriter.accept(p);
         }
     }
-/*
-    public void drawPolygon (Polygon polygon) {
-        List<Point> points = polygon.getVertices();
 
-        if (points.size() < 1) return;
-
-        Point p1, p2;
-        for (int i = 0; i < points.size() - 1; i++) {
-            p1 = points.get(i);
-            p2 = points.get(i+1);
-            drawBresenhamLine(p1, p2);
-        }
-
-        Point lastPoint = points.get(points.size() - 1 );
-        Point firstPoint = points.get(0);
-
-        drawBresenhamLine(lastPoint, firstPoint);
-    }*/
-
-    public void scanFill (Polygon polygon) {
+    public CircleFigure circleFill(Point c, double radius) {
+        setPatternDraw(PatternType.D1);
+        drawCircle(c, radius);
         setPatternDraw(PatternType.D2);
+        floodFill(c);
+        return new CircleFigure(c, radius, true, getConfiguration());
+    }
 
+    //public void drawPolygon(Polygon polygon) {
+    //    List<Point> points = polygon.getVertices();
+    //
+    //    if (points.size() < 1) return;
+    //
+    //    Point p1, p2;
+    //    for (int i = 0; i < points.size() - 1; i++) {
+    //        p1 = points.get(i);
+    //        p2 = points.get(i+1);
+    //        drawBresenhamLine(p1, p2);
+    //    }
+    //
+    //    Point lastPoint = points.get(points.size() - 1 );
+    //    Point firstPoint = points.get(0);
+    //
+    //    drawBresenhamLine(lastPoint, firstPoint);
+    //}
+
+    public PolygonFigure scanFill(Polygon polygon) {
+        setPatternDraw(PatternType.D2);
         List<Edge> sortedEdges = polygon.getSortedEdges();
         List<Integer> xCrossings = new ArrayList<>();
-
-        for (int scanline = polygon.getYMin(); scanline <= polygon.getYMax(); scanline++)
-        {
+        for (int scanline = polygon.getYMin(); scanline <= polygon.getYMax(); scanline++) {
             xCrossings.clear();
             for (Edge sortedEdge : sortedEdges) {
                 // lowest Y vertice intersection
                 if (scanline == sortedEdge.p1.y) {
-                    if (scanline == sortedEdge.p2.y) // horizontal edge
-                    {
+                    if (scanline == sortedEdge.p2.y) { // horizontal edge
                         sortedEdge.off();
                         xCrossings.add((int) sortedEdge.getX());
                     } else {
@@ -323,11 +359,11 @@ public class Grapher {
                 }
             }
             Collections.sort(xCrossings);
-            for (int i = 0; i < xCrossings.size(); i+=2) {
-                drawBresenhamLine(Point.at(xCrossings.get(i), scanline), Point.at(xCrossings.get(i+1), scanline), PatternType.D2);
+            for (int i = 0; i < xCrossings.size(); i += 2) {
+                drawBresenhamLine(Point.at(xCrossings.get(i), scanline), Point.at(xCrossings.get(i + 1), scanline), PatternType.D2);
             }
-
         }
+        return new PolygonFigure(polygon.getVertices(), PolygonFigure.FillAlgorithm.SCAN_LINE, getConfiguration());
     }
 
     public int getPixelColor(Point p) {
@@ -354,9 +390,8 @@ public class Grapher {
         }
     }
 
-    public void floodFillPolygon (List<Point> poly) {
+    public PolygonFigure floodFillPolygon(List<Point> poly) {
         setPatternDraw(PatternType.D2);
-        
         List<Point> triangle = new ArrayList<>();
         while (poly.size() > 3) { //run untill the  polygon is triangulated
             boolean earFound = false;
@@ -379,9 +414,11 @@ public class Grapher {
             }
         }
         floodFillTriangulatedPolygon(poly); // fill the last triangle
+        return new PolygonFigure(poly, PolygonFigure.FillAlgorithm.FLOOD_FILL, getConfiguration());
     }
 
     //determines whether a given point p is inside or outside the given polygon
+    /* TODO: Remove from here =( */
     private static boolean isInsidePolygon(List<Point> polygon, Point p) {
         List<Pair<Point, Point>> edges = polygon.stream().collect(() -> Lists.newArrayList(Pair.of(null, null)), (ArrayList<Pair<Point, Point>> es, Point q) -> {
             es.get(es.size() - 1).last = q;
