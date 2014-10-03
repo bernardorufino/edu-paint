@@ -120,7 +120,7 @@ public class LineClipping {
                 Point p2 = poly_in.get(i+1);
                 poly_out.addAll(clipEdge(new Edge(Point.at(p1.x, p1.y), Point.at(p2.x, p2.y)), wEdge));
             }
-            poly_in = poly_out;
+            poly_in = new ArrayList<>(poly_out);
         }
         return new Polygon(poly_out);
     }
@@ -137,7 +137,7 @@ public class LineClipping {
     }
 
     private Point getIntersection(Edge edge, windowEdge wEdge) {
-        Point pi = edge.p1;
+        Point pi = Point.copy(edge.p1);
         switch (wEdge) {
             case LEFT:
                 pi.x = mWXL;

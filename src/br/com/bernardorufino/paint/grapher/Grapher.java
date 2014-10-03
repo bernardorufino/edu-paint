@@ -407,24 +407,6 @@ public class Grapher {
     }
 
     public void applyZoom(Point p, Point q) {
-
-        LineClipping lc = new LineClipping();
-        lc.setWindow(Point.at(100,100), Point.at(200,200));
-
-        List<Point> vertices = new ArrayList<Point>();
-        vertices.add(Point.at(150, 150));
-        vertices.add(Point.at(210, 150));
-        vertices.add(Point.at(150, 210));
-        vertices.add(Point.at(90, 150));
-        vertices.add(Point.at(110, 110));
-        Polygon velho = new Polygon(vertices);
-        Polygon novo = lc.clipPolygon(velho);
-
-        System.out.println(novo.toString());
-        System.out.println(velho.toString());
-        drawPolygon(velho);
-        drawPolygon(novo);
-
         FrameBuffer fb = getFrameBuffer();
 
         int width = fb.getWidth();
