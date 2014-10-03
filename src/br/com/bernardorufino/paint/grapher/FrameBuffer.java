@@ -22,11 +22,11 @@ public class FrameBuffer {
     private final GraphicsContext mGc; /* TODO: privatize */
 
     public int getWidth() {
-        return mWidth;
+        return mWidth / mResizeFactor;
     }
 
     public int getHeight() {
-        return mHeight;
+        return mHeight / mResizeFactor;
     }
 
     private int mWidth;

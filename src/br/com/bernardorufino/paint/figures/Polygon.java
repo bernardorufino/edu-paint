@@ -1,9 +1,6 @@
 package br.com.bernardorufino.paint.figures;
 
-import br.com.bernardorufino.paint.ext.Edge;
-import br.com.bernardorufino.paint.ext.Pack;
-import br.com.bernardorufino.paint.ext.Persistable;
-import br.com.bernardorufino.paint.ext.Point;
+import br.com.bernardorufino.paint.ext.*;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Ordering;
 
@@ -60,6 +57,14 @@ public class Polygon implements Persistable {
         List<Edge> edges = getEdges();
         edges.sort((a, b) -> Integer.compare(a.p1.y, b.p1.y));
         return edges;
+    }
+
+    public Polygon applyTransformation(Matrix matrix) {
+        List<Point> vertices = new ArrayList<>();
+        for (Point vertice : mVertices) {
+            vertices.add(matrix.doTransformation(vertice));
+        }
+        return new Polygon(vertices);
     }
 
     public static final Creator<Polygon> CREATOR = new Creator<Polygon>() {

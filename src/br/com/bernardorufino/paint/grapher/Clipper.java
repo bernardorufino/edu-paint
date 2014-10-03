@@ -109,7 +109,7 @@ public class Clipper {
     public enum windowEdge { TOP, RIGHT, BOTTOM, LEFT };
 
     public Polygon clipPolygon(Polygon polygon) {
-        List<Point> poly_in = polygon.getVertices();
+        List<Point> poly_in = new ArrayList<>(polygon.getVertices());
         List<Point> poly_out = new ArrayList<Point>();
         for(windowEdge wEdge : windowEdge.values()) {
             poly_out.clear();

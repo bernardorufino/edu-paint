@@ -13,6 +13,12 @@ import java.util.List;
 
 public class PolygonFigure extends Polygon implements PersistableFigure {
 
+    public static PolygonFigure applyConfiguration(Iterable<? extends Point> vertices, PolygonFigure copyConfigFrom) {
+        Configuration configuration = copyConfigFrom.getConfiguration();
+        FillAlgorithm fillAlgorithmn = copyConfigFrom.getFillAlgorithmn();
+        return new PolygonFigure(vertices, fillAlgorithmn, configuration);
+    }
+
     private FillAlgorithm mAlgorithm;
     private Configuration mConfiguration;
 
@@ -97,6 +103,10 @@ public class PolygonFigure extends Polygon implements PersistableFigure {
             return new PolygonFigure(in);
         }
     };
+
+    public FillAlgorithm getFillAlgorithmn() {
+        return mAlgorithm;
+    }
 
     public static enum FillAlgorithm { FLOOD_FILL, SCAN_LINE }
 }

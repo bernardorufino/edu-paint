@@ -130,7 +130,7 @@ public class WindowController extends ContextAwareController implements Initiali
                 .put(vFloodFillTool, new FloodFillTool())
                 .put(vScanLineTool, new ScanLineTool())
                 .put(vCircleFill, new CircleFillTool())
-                .put(vZoomTool, new ZoomTool(mFigures))
+                .put(vZoomTool, new ZoomTool(this, mFigures))
                 .put(vSelectButton, new SelectTool())
                 .build();
         mTools = new ArrayList<>(tools.size());
@@ -195,7 +195,7 @@ public class WindowController extends ContextAwareController implements Initiali
         }
     }
 
-    private void resetFigures(Iterable<? extends PersistableFigure> figures) {
+    public void resetFigures(Iterable<? extends PersistableFigure> figures) {
         mFigures.clear();
         mFb.clean();
         for (PersistableFigure figure : figures) {

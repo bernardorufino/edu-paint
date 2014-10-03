@@ -1,8 +1,10 @@
 package br.com.bernardorufino.paint.tools;
 
+import br.com.bernardorufino.paint.ext.Pair;
 import br.com.bernardorufino.paint.ext.Point;
 import br.com.bernardorufino.paint.figures.PersistableFigure;
 import br.com.bernardorufino.paint.figures.Polygon;
+import br.com.bernardorufino.paint.ui.WindowController;
 import javafx.scene.input.MouseEvent;
 
 import java.util.ArrayList;
@@ -14,10 +16,12 @@ import java.util.List;
 public class ZoomTool extends Tool {
 
     private final List<PersistableFigure> mFigures;
+    private final WindowController mWindow;
     private boolean mZooming;
     private Point mFirstPoint;
 
-    public ZoomTool(List<PersistableFigure> mFigures) {
+    public ZoomTool(WindowController window, List<PersistableFigure> mFigures) {
+        mWindow = window;
         this.mFigures = mFigures;
     }
 
@@ -26,7 +30,8 @@ public class ZoomTool extends Tool {
         super.onMousePressed(event);
         if (mZooming) {
             mFb.rollback();
-            zoom(mFirstPoint, getPosition(event), event);
+            Pair<Point, Point> points = adjustZoom(mFirstPoint, getPosition(event));
+            zoom(points.first, points.last, event);
             mZooming = false;
             notifyFinishUseListener();
         } else {
@@ -43,8 +48,62 @@ public class ZoomTool extends Tool {
         super.onMouseMoved(event);
         if (mZooming) {
             mFb.rollback().begin();
-            draw(mFirstPoint, getPosition(event), event);
+            Pair<Point, Point> points = adjustZoom(mFirstPoint, getPosition(event));
+            draw(points.first, points.last, event);
         }
+    }
+
+    private Pair<Point, Point> adjustZoom(Point p, Point q) {
+        double ar = (double) mFb.getWidth() / mFb.getHeight();
+        double sx = (double) mFb.getWidth() / Math.abs(p.x - q.x);
+        double sy = (double) mFb.getHeight() / Math.abs(p.y - q.y);
+
+        switch (getPositionOfFirst(p, q)) {
+            case TOP_LEFT:
+                if (sx < sy) {
+                    q.x = (int) (p.x + Math.abs(p.y - q.y) * ar);
+                } else {
+                    q.y = (int) (p.y + Math.abs(p.x - q.x) / ar);
+                }
+                break;
+            case TOP_RIGHT:
+                if (sx < sy) {
+                    q.x = (int) (p.x - Math.abs(p.y - q.y) * ar);
+                } else {
+                    q.y = (int) (p.y + Math.abs(p.x - q.x) / ar);
+                }
+                break;
+            case BOTTOM_RIGHT:
+                if (sx < sy) {
+                    q.x = (int) (p.x - Math.abs(p.y - q.y) * ar);
+                } else {
+                    q.y = (int) (p.y - Math.abs(p.x - q.x) / ar);
+                }
+                break;
+            case BOTTOM_LEFT:
+                if (sx < sy) {
+                    q.x = (int) (p.x + Math.abs(p.y - q.y) * ar);
+                } else {
+                    q.y = (int) (p.y - Math.abs(p.x - q.x) / ar);
+                }
+                break;
+        }
+
+        Point pf = Point.at(Math.min(p.x, q.x), Math.min(p.y, q.y));
+        Point qf = Point.at(Math.max(p.x, q.x), Math.max(p.y, q.y));
+        return Pair.of(pf, qf);
+    }
+
+    private RectangleVertex getPositionOfFirst(Point p, Point q) {
+        int xmin = Math.min(p.x, q.x);
+        int xmax = Math.max(p.x, q.x);
+        int ymin = Math.min(p.y, q.y);
+        int ymax = Math.max(p.y, q.y);
+        if (p.equals(Point.at(xmin, ymin))) return RectangleVertex.TOP_LEFT;
+        if (p.equals(Point.at(xmax, ymin))) return RectangleVertex.TOP_RIGHT;
+        if (p.equals(Point.at(xmax, ymax))) return RectangleVertex.BOTTOM_RIGHT;
+        if (p.equals(Point.at(xmin, ymax))) return RectangleVertex.BOTTOM_LEFT;
+        return null;
     }
 
     protected void draw(Point p, Point q, MouseEvent event) {
@@ -56,7 +115,11 @@ public class ZoomTool extends Tool {
         Polygon rectangle = new Polygon(vertices);
         mGrapher.drawPolygon(rectangle);
     }
+
     protected void zoom(Point p, Point q, MouseEvent event) {
-        mGrapher.applyZoom(p, q, mFigures);
+        List<? extends PersistableFigure> newFigures = mGrapher.applyZoom(p, q, mFigures);
+        mWindow.resetFigures(new ArrayList<>(newFigures));
     }
+
+    private static enum RectangleVertex { TOP_LEFT, TOP_RIGHT, BOTTOM_RIGHT, BOTTOM_LEFT }
 }

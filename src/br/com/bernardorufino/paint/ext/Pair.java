@@ -2,7 +2,7 @@ package br.com.bernardorufino.paint.ext;
 
 public class Pair<T, K> {
 
-    public static <T, K> Pair of(T first, K last) {
+    public static <T, K> Pair<T, K> of(T first, K last) {
         return new Pair<>(first, last);
     }
 

@@ -13,6 +13,7 @@ import javafx.scene.paint.Color;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class Grapher {
 
@@ -159,7 +160,7 @@ public class Grapher {
         // Activates the drawing of patterns
         setPatternDraw(patternType);
         // Calls the Bresenham algorithm with usual drawPixel function
-        drawBresenhamLine(p, q, this::drawPixel);
+        drawBresenhamLine(p, q, this::safeDrawPixel);
         return this;
     }
 
@@ -461,11 +462,15 @@ public class Grapher {
         floodFill(seed); //calls floodFill for the calculated center
     }
 
-    public void applyZoom(Point p, Point q, List<PersistableFigure> mFigures) {
+    public List<? extends PersistableFigure> applyZoom(Point p, Point q, List<PersistableFigure> mFigures) {
+
+
         FrameBuffer fb = getFrameBuffer();
 
         int width = fb.getWidth();
         int height = fb.getHeight();
+
+        double ar = width / height;
 
         double xc = (p.x + q.x) / 2.0;
         double yc = (p.y + q.y) / 2.0;
@@ -475,11 +480,16 @@ public class Grapher {
 
         double s = Math.min(sx, sy);
 
+
         Matrix M = new Matrix();
         M.identity();
         M.translate(-xc, -yc);
         M.scale(s);
         M.translate(width/2, height/2);
+
+        M.doTransformation(p);
+        M.doTransformation(q);
+
 
         Clipper clipper = new Clipper();
         clipper.setWindow(p, q);
@@ -491,17 +501,23 @@ public class Grapher {
             }
         }
         for (PersistableFigure figure : toBeRemoved) {
+            /* TODO: Ugly =( */
             mFigures.remove(figure);
         }
-        List<PersistableFigure> newPolys = new ArrayList<>();
+        List<PolygonFigure> newPolys = new ArrayList<>();
         for (PersistableFigure figure : mFigures) {
             PolygonFigure poly = (PolygonFigure) figure;
-            newPolys.add(clipper.clipPolygon(poly));
-
+            Polygon newPoly = clipper.clipPolygon(poly);
+            PolygonFigure newPolyFigure = PolygonFigure.applyConfiguration(newPoly.getVertices(), poly);
+            newPolys.add(newPolyFigure);
         }
-        //Point newP = M.doTransformation(p);
-        //Point newQ = M.doTransformation(q);
-        //DrawFigures();
+
+        newPolys = newPolys.stream().map(poly -> {
+            Polygon newPoly = poly.applyTransformation(M);
+            return PolygonFigure.applyConfiguration(newPoly.getVertices(), poly);
+        }).collect(Collectors.toList());
+
+        return newPolys;
     }
 
     private static enum PatternType { D1, D2, NONE }
