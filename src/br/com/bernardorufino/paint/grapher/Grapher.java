@@ -395,16 +395,19 @@ public class Grapher {
                 .count() % 2 == 1;
     }
 
+    //checks whether a given point p is inside a given circle (given by its center and radius)
     private static boolean isInsideCircle(Point center, double radius, Point p) {
         return (p.distanceTo(center) <= radius);
     }
 
+    //checks whether a given point p lies in the line segment between two given points a and b
     private static boolean isInsideLine(Point a, Point b, Point p) {
+        //first check if p is inside the box defined by a and b
         if ((p.x > a.x && p.x < b.x) || (p.x > b.x && p.x < a.x)) {
             if ((p.y > a.y && p.y < b.y) || (p.y > b.y && p.y < a.y)) {
-                float slope = (a.y - b.y) / (a.x - b.x);
-                float yIntercept = a.y - (slope * a.x);
-                return Math.abs(p.y - (slope * p.x + yIntercept)) < 0.01;
+                float slope = (a.y - b.y) / (a.x - b.x); //calculating the slope of the segment
+                float yIntercept = a.y - (slope * a.x); //calculating the yIntercept of the segment
+                return Math.abs(p.y - (slope * p.x + yIntercept)) < 0.01; //checking if the point is part of the line
 
             }
             return false;
