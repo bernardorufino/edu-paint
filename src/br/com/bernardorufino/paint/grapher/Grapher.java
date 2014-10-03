@@ -1,9 +1,6 @@
 package br.com.bernardorufino.paint.grapher;
 
-import br.com.bernardorufino.paint.ext.BitMatrix;
-import br.com.bernardorufino.paint.ext.Edge;
-import br.com.bernardorufino.paint.ext.Pair;
-import br.com.bernardorufino.paint.ext.Point;
+import br.com.bernardorufino.paint.ext.*;
 import br.com.bernardorufino.paint.figures.CircleFigure;
 import br.com.bernardorufino.paint.figures.LineFigure;
 import br.com.bernardorufino.paint.figures.Polygon;
@@ -313,23 +310,23 @@ public class Grapher {
         return new CircleFigure(c, radius, true, getConfiguration());
     }
 
-    //public void drawPolygon(Polygon polygon) {
-    //    List<Point> points = polygon.getVertices();
-    //
-    //    if (points.size() < 1) return;
-    //
-    //    Point p1, p2;
-    //    for (int i = 0; i < points.size() - 1; i++) {
-    //        p1 = points.get(i);
-    //        p2 = points.get(i+1);
-    //        drawBresenhamLine(p1, p2);
-    //    }
-    //
-    //    Point lastPoint = points.get(points.size() - 1 );
-    //    Point firstPoint = points.get(0);
-    //
-    //    drawBresenhamLine(lastPoint, firstPoint);
-    //}
+    public void drawPolygon(Polygon polygon) {
+        List<Point> points = polygon.getVertices();
+
+        if (points.size() < 1) return;
+
+        Point p1, p2;
+        for (int i = 0; i < points.size() - 1; i++) {
+            p1 = points.get(i);
+            p2 = points.get(i+1);
+            drawBresenhamLine(p1, p2);
+        }
+
+        Point lastPoint = points.get(points.size() - 1 );
+        Point firstPoint = points.get(0);
+
+        drawBresenhamLine(lastPoint, firstPoint);
+    }
 
     public PolygonFigure scanFill(Polygon polygon) {
         setPatternDraw(PatternType.D2);
@@ -465,6 +462,32 @@ public class Grapher {
         seed.y /= poly.size();
 
         floodFill(seed); //calls floodFill for the calculated center
+    }
+
+    public void applyZoom(Point p, Point q) {
+        FrameBuffer fb = getFrameBuffer();
+
+        int width = fb.getWidth();
+        int height = fb.getHeight();
+
+        double xc = (p.x + q.x) / 2.0;
+        double yc = (p.y + q.y) / 2.0;
+
+        double sx = (double) width/Math.abs(p.x - q.x);
+        double sy = (double) height/Math.abs(p.y - q.y);
+
+        double s = Math.min(sx, sy);
+
+        Matrix M = new Matrix();
+        M.identity();
+        M.translate(-xc, -yc);
+        M.scale(s);
+        M.translate(width/2, height/2);
+
+
+        //Point newP = M.doTransformation(p);
+        //Point newQ = M.doTransformation(q);
+        //DrawFigures();
     }
 
     private static enum PatternType { D1, D2, NONE }

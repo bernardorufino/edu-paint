@@ -1,11 +1,7 @@
 package br.com.bernardorufino.paint.tools;
 
-import br.com.bernardorufino.paint.ext.Matrix;
 import br.com.bernardorufino.paint.ext.Point;
-import br.com.bernardorufino.paint.ext.Polygon;
-import br.com.bernardorufino.paint.grapher.FrameBuffer;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
+import br.com.bernardorufino.paint.figures.Polygon;
 import javafx.scene.input.MouseEvent;
 
 import java.util.ArrayList;

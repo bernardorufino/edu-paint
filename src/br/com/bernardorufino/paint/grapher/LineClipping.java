@@ -2,11 +2,10 @@ package br.com.bernardorufino.paint.grapher;
 
 import br.com.bernardorufino.paint.ext.Edge;
 import br.com.bernardorufino.paint.ext.Point;
-import br.com.bernardorufino.paint.ext.Polygon;
+import br.com.bernardorufino.paint.figures.Polygon;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Created by diogosfreitas on 02/10/2014.
