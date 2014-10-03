@@ -10,6 +10,7 @@ import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.paint.Color;
 
+import javax.sound.sampled.Line;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -496,7 +497,7 @@ public class Grapher {
 
         List<PersistableFigure> toBeRemoved = new ArrayList<>();
         for (PersistableFigure figure : mFigures) {
-            if (!(figure instanceof PolygonFigure)) {
+            if (!(figure instanceof PolygonFigure) && !(figure instanceof LineFigure) ) {
                 toBeRemoved.add(figure);
             }
         }
@@ -504,21 +505,34 @@ public class Grapher {
             /* TODO: Ugly =( */
             mFigures.remove(figure);
         }
-        List<PolygonFigure> newPolys = new ArrayList<>();
-        for (PersistableFigure figure : mFigures) {
-            PolygonFigure poly = (PolygonFigure) figure;
-            Polygon newPoly = clipper.clipPolygon(poly);
-            if (newPoly == null) continue;
-            PolygonFigure newPolyFigure = PolygonFigure.applyConfiguration(newPoly.getVertices(), poly);
-            newPolys.add(newPolyFigure);
-        }
+        List<PersistableFigure> newFigures = new ArrayList<>();
 
-        newPolys = newPolys.stream().map(poly -> {
+        for (PersistableFigure figure : mFigures) {
+            if(figure instanceof PolygonFigure) {
+                PolygonFigure poly = (PolygonFigure) figure;
+                Polygon newPoly = clipper.clipPolygon(poly);
+                if (newPoly == null) continue;
+                PolygonFigure newPolyFigure = PolygonFigure.applyConfiguration(newPoly.getVertices(), poly);
+                newPoly = newPolyFigure.applyTransformation(M);
+                newPolyFigure = PolygonFigure.applyConfiguration(newPoly.getVertices(), poly);
+                newFigures.add(newPolyFigure);
+            }
+            else if(figure instanceof LineFigure) {
+                LineFigure line = (LineFigure) figure;
+                Edge edge = clipper.clipLine(new Edge(line.getStart(), line.getEnd()));
+                if (edge == null) continue;
+                LineFigure newLine = new LineFigure(Point.copy(edge.p1), Point.copy(edge.p2), line.getConfiguration());
+                newLine = newLine.applyTransformation(M);
+                newFigures.add(newLine);
+            }
+        }
+/*
+        newFigures = newFigures.stream().map(poly -> {
             Polygon newPoly = poly.applyTransformation(M);
             return PolygonFigure.applyConfiguration(newPoly.getVertices(), poly);
         }).collect(Collectors.toList());
-
-        return newPolys;
+*/
+        return newFigures;
     }
 
     private static enum PatternType { D1, D2, NONE }

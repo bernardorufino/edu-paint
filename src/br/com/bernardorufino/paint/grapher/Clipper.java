@@ -20,18 +20,6 @@ public class Clipper {
 
     private int inside = 0, bottom = 1, top = 2, right = 4, left = 8;
 
-    public Point XEdgeIntersection(Edge edge, int wy) {
-        int x = (int) (edge.p1.x + (edge.p2.x - edge.p1.x) * (wy - edge.p1.y) / (edge.p2.y - edge.p1.y));
-        int y = wy;
-        return Point.at(x, y);
-    }
-
-    public Point YEdgeIntersection(Edge edge, int wx) {
-        int x = wx;
-        int y = (int) (edge.p1.y + (edge.p2.y - edge.p1.y) * (wx - edge.p1.x) / (edge.p2.x - edge.p1.x));
-        return Point.at(x, y);
-    }
-
     public int getCode2D(Point p) {
         int c;
         c = inside;
@@ -40,9 +28,9 @@ public class Clipper {
         else if(p.x > mWXH)
             c |= right;
         if(p.y < mWYL)
-            c |=  bottom;
+            c |=  top;
         else if( p.y > mWYH)
-            c |= top ;
+            c |= bottom ;
         return c;
     }
 
@@ -53,8 +41,8 @@ public class Clipper {
         mVWSY = (mVYH - mVYL)/(mWYH - mWYL);
     }
 
-    public Edge clip2D(Edge edge) {
-        Edge newEdge = new Edge(edge.p1, edge.p2);
+    public Edge clipLine(Edge edge) {
+        Edge newEdge = new Edge(Point.copy(edge.p1), Point.copy(edge.p2));
         int c , c1 , c2;
         Point xy;
         c1 = getCode2D(edge.p1);
@@ -63,7 +51,7 @@ public class Clipper {
         while (((c1 != inside ) || (c2 != inside)) )
         {
             if ( (c1&c2) != inside )
-                return newEdge;
+                return null;
             else
             {
                 xy = newEdge.p1;
@@ -71,13 +59,13 @@ public class Clipper {
                 if(c == inside)
                     c = c2;
                 if((left & c) != inside)
-                    xy = YEdgeIntersection(edge, mWXL);
+                    xy = getIntersection(edge, windowEdge.LEFT);
                 else if ((right & c) != inside)
-                    xy = YEdgeIntersection(edge, mWXH);
+                    xy = getIntersection(edge, windowEdge.RIGHT);
                 else if((bottom & c) != inside)
-                    xy = XEdgeIntersection(edge, mWYL);
+                    xy = getIntersection(edge, windowEdge.BOTTOM);
                 else if((top & c) != inside)
-                    xy = XEdgeIntersection(edge, mWYH);
+                    xy = getIntersection(edge, windowEdge.TOP);
                 if (c == c1) {
                     newEdge.p1 = xy;
                     c1 = getCode2D (newEdge.p1);
@@ -88,13 +76,13 @@ public class Clipper {
                     if(c == inside)
                         c = c1;
                     if((left & c) != inside)
-                        xy = YEdgeIntersection(newEdge, mWXL);
+                        xy = getIntersection(edge, windowEdge.LEFT);
                     else if ((right & c) != inside)
-                        xy = YEdgeIntersection(newEdge, mWXH);
+                        xy = getIntersection(edge, windowEdge.RIGHT);
                     else if((bottom & c) != inside)
-                        xy = XEdgeIntersection(newEdge, mWYL);
+                        xy = getIntersection(edge, windowEdge.BOTTOM);
                     else if((top & c) != inside)
-                        xy = XEdgeIntersection(newEdge, mWYH);
+                        xy = getIntersection(edge, windowEdge.TOP);
                     if (c == c2) {
                         newEdge.p2 = xy;
                         c2 = getCode2D (newEdge.p2);
