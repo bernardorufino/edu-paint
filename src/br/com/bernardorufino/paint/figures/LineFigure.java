@@ -1,11 +1,15 @@
 package br.com.bernardorufino.paint.figures;
 
+import br.com.bernardorufino.paint.ext.Matrix;
 import br.com.bernardorufino.paint.ext.Pack;
 import br.com.bernardorufino.paint.ext.Point;
 import br.com.bernardorufino.paint.grapher.Configuration;
 import br.com.bernardorufino.paint.grapher.Grapher;
 
+import javax.sound.sampled.Line;
+import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.List;
 
 public class LineFigure implements PersistableFigure {
 
@@ -82,4 +86,18 @@ public class LineFigure implements PersistableFigure {
             return new LineFigure(in);
         }
     };
+
+    public Point getStart() {
+        return mStart;
+    }
+
+    public Point getEnd() {
+        return mEnd;
+    }
+
+    public LineFigure applyTransformation(Matrix matrix) {
+        return new LineFigure(matrix.doTransformation(mStart), matrix.doTransformation(mEnd), mConfiguration);
+
+    }
+
 }
