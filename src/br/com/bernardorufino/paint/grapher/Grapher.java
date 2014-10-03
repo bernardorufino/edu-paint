@@ -407,7 +407,8 @@ public class Grapher {
             if ((p.y > a.y && p.y < b.y) || (p.y > b.y && p.y < a.y)) {
                 float slope = (a.y - b.y) / (a.x - b.x); //calculating the slope of the segment
                 float yIntercept = a.y - (slope * a.x); //calculating the yIntercept of the segment
-                return Math.abs(p.y - (slope * p.x + yIntercept)) < 0.01; //checking if the point is part of the line
+                //checking if the point is part of the line
+                return Math.abs(p.y - (slope * p.x + yIntercept)) < 0.01; //TODO check if 0.01 is a good threshold
 
             }
             return false;
