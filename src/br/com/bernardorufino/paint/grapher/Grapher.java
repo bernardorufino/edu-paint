@@ -387,24 +387,25 @@ public class Grapher {
     }
 
     public PolygonFigure floodFillPolygon(List<Point> poly) {
+        poly = new ArrayList<>(poly);
         setPatternDraw(PatternType.D2);
+        drawPolygon(new Polygon(poly));
         List<Point> triangle = new ArrayList<>();
         while (poly.size() > 3) { //run untill the  polygon is triangulated
             boolean earFound = false;
-            int i = poly.size()-1; // starts with the last vertex
+            int i = poly.size() - 1; // starts with the last vertex
             while (!earFound) {
-                Point mediumPoint = poly.get(((i-1)%poly.size()+poly.size())%poly.size()).plus(poly.get(((i+1)%poly.size()+poly.size())%poly.size())).times(0.5);
+                Point mediumPoint = poly.get(((i - 1) % poly.size() + poly.size()) % poly.size()).plus(poly.get(((i + 1) % poly.size() + poly.size()) % poly.size())).times(0.5);
                 if (isInsidePolygon(poly, mediumPoint)) { // check if vertex i makes an ear
                     triangle.add(poly.get(i));
-                    triangle.add(poly.get(((i-1)%poly.size()+poly.size())%poly.size()));
-                    triangle.add(poly.get(((i+1)%poly.size()+poly.size())%poly.size()));
+                    triangle.add(poly.get(((i - 1) % poly.size() + poly.size()) % poly.size()));
+                    triangle.add(poly.get(((i + 1) % poly.size() + poly.size()) % poly.size()));
                     drawBresenhamLine(triangle.get(1), triangle.get(2));
                     floodFillTriangulatedPolygon(triangle); // fill the triangle just created
                     triangle.clear();
                     poly.remove(i); // remove the ear
                     earFound = true;
-                }
-                else { // if that vertex doesn't make an ear, try the preceding one
+                } else { // if that vertex doesn't make an ear, try the preceding one
                     i--;
                 }
             }
