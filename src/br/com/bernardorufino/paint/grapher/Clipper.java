@@ -106,22 +106,24 @@ public class Clipper {
     }
 
 
-    public enum windowEdge { TOP, RIGHT, BOTTOM, LEFT };
+    public enum windowEdge { TOP, RIGHT, BOTTOM, LEFT }
 
     public Polygon clipPolygon(Polygon polygon) {
         List<Point> poly_in = new ArrayList<>(polygon.getVertices());
-        List<Point> poly_out = new ArrayList<Point>();
+        List<Point> poly_out = new ArrayList<>();
         for(windowEdge wEdge : windowEdge.values()) {
             poly_out.clear();
-            poly_in.add(poly_in.get(0));
-            for(int i = 0; i < poly_in.size()-1; i++) {
-                Point p1 = poly_in.get(i);
-                Point p2 = poly_in.get(i+1);
-                poly_out.addAll(clipEdge(new Edge(Point.at(p1.x, p1.y), Point.at(p2.x, p2.y)), wEdge));
+            if (!poly_in.isEmpty()) {
+                poly_in.add(poly_in.get(0));
+                for (int i = 0; i < poly_in.size() - 1; i++) {
+                    Point p1 = poly_in.get(i);
+                    Point p2 = poly_in.get(i + 1);
+                    poly_out.addAll(clipEdge(new Edge(Point.at(p1.x, p1.y), Point.at(p2.x, p2.y)), wEdge));
+                }
             }
             poly_in = new ArrayList<>(poly_out);
         }
-        return new Polygon(poly_out);
+        return (poly_out.size() < 2) ? null : new Polygon(poly_out);
     }
 
     public List<Point> clipEdge(Edge edge, windowEdge wEdge) {

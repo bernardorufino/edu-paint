@@ -10,6 +10,7 @@ import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 
@@ -53,6 +54,10 @@ public abstract class Tool {
     }
 
     public void onMouseClicked(MouseEvent event) {
+        /* Override */
+    }
+
+    public void onKeyTyped(KeyEvent e) {
         /* Override */
     }
 

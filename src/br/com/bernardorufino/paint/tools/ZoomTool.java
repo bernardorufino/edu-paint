@@ -5,16 +5,19 @@ import br.com.bernardorufino.paint.ext.Point;
 import br.com.bernardorufino.paint.figures.PersistableFigure;
 import br.com.bernardorufino.paint.figures.Polygon;
 import br.com.bernardorufino.paint.ui.WindowController;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 /**
  * Created by diogosfreitas on 03/10/2014.
  */
 public class ZoomTool extends Tool {
 
+    private final Stack<List<PersistableFigure>> mFiguresStack = new Stack<>();
     private final List<PersistableFigure> mFigures;
     private final WindowController mWindow;
     private boolean mZooming;
@@ -94,6 +97,18 @@ public class ZoomTool extends Tool {
         return Pair.of(pf, qf);
     }
 
+    @Override
+    public void onKeyTyped(KeyEvent e) {
+        super.onKeyTyped(e);
+        int ch = e.getCharacter().toCharArray()[0];
+        if ((e.getCharacter().equals("z") || e.getCharacter().equals("Z") || ch == 26) && e.isControlDown() && !e.isShiftDown()) {
+            if (!mFiguresStack.isEmpty()) {
+                List<PersistableFigure> figures = mFiguresStack.pop();
+                mWindow.resetFigures(figures);
+            }
+        }
+    }
+
     private RectangleVertex getPositionOfFirst(Point p, Point q) {
         int xmin = Math.min(p.x, q.x);
         int xmax = Math.max(p.x, q.x);
@@ -107,7 +122,7 @@ public class ZoomTool extends Tool {
     }
 
     protected void draw(Point p, Point q, MouseEvent event) {
-        List<Point> vertices = new ArrayList<Point>();
+        List<Point> vertices = new ArrayList<>();
         vertices.add(p);
         vertices.add(Point.at(q.x, p.y));
         vertices.add(q);
@@ -118,6 +133,7 @@ public class ZoomTool extends Tool {
 
     protected void zoom(Point p, Point q, MouseEvent event) {
         List<? extends PersistableFigure> newFigures = mGrapher.applyZoom(p, q, mFigures);
+        mFiguresStack.push(new ArrayList<>(mFigures));
         mWindow.resetFigures(new ArrayList<>(newFigures));
     }
 

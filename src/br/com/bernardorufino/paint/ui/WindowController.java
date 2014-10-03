@@ -15,6 +15,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
@@ -168,6 +169,13 @@ public class WindowController extends ContextAwareController implements Initiali
         vPattern2d.setItems(pattern2dChoices);
         Properties.bind(mGrapher.pattern2dProperty(), p -> p.pattern2d, vPattern2d.valueProperty());
         vPattern2d.getSelectionModel().select(0);
+    }
+
+    @Override
+    protected void onSceneSet(Scene scene) {
+        scene.setOnKeyTyped(event -> {
+            getCurrentTool().onKeyTyped(event);
+        });
     }
 
     private Tool getCurrentTool() {

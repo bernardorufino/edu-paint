@@ -35,6 +35,7 @@ public class ContextAwareController implements Initializable {
 
     public ContextAwareController setScene(Scene scene) {
         mScene.setValue(scene);
+        onSceneSet(scene);
         return this;
     }
 
@@ -49,6 +50,10 @@ public class ContextAwareController implements Initializable {
     public ContextAwareController setStage(Stage stage) {
         mStage.setValue(stage);
         return this;
+    }
+
+    protected void onSceneSet(Scene stage) {
+        /* Override */
     }
 
     protected Property<Stage> stageProperty() {

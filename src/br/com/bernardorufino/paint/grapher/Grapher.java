@@ -508,6 +508,7 @@ public class Grapher {
         for (PersistableFigure figure : mFigures) {
             PolygonFigure poly = (PolygonFigure) figure;
             Polygon newPoly = clipper.clipPolygon(poly);
+            if (newPoly == null) continue;
             PolygonFigure newPolyFigure = PolygonFigure.applyConfiguration(newPoly.getVertices(), poly);
             newPolys.add(newPolyFigure);
         }
