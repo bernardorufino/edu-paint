@@ -1,6 +1,7 @@
 package br.com.bernardorufino.paint.tools;
 
 import br.com.bernardorufino.paint.ext.Point;
+import br.com.bernardorufino.paint.figures.PersistableFigure;
 import br.com.bernardorufino.paint.figures.Polygon;
 import javafx.scene.input.MouseEvent;
 
@@ -12,8 +13,13 @@ import java.util.List;
  */
 public class ZoomTool extends Tool {
 
+    private final List<PersistableFigure> mFigures;
     private boolean mZooming;
     private Point mFirstPoint;
+
+    public ZoomTool(List<PersistableFigure> mFigures) {
+        this.mFigures = mFigures;
+    }
 
     @Override
     public void onMouseClicked(MouseEvent event) {
@@ -51,6 +57,6 @@ public class ZoomTool extends Tool {
         mGrapher.drawPolygon(rectangle);
     }
     protected void zoom(Point p, Point q, MouseEvent event) {
-        mGrapher.applyZoom(p, q);
+        mGrapher.applyZoom(p, q, mFigures);
     }
 }

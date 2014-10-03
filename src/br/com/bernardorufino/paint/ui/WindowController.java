@@ -130,7 +130,7 @@ public class WindowController extends ContextAwareController implements Initiali
                 .put(vFloodFillTool, new FloodFillTool())
                 .put(vScanLineTool, new ScanLineTool())
                 .put(vCircleFill, new CircleFillTool())
-                .put(vZoomTool, new ZoomTool())
+                .put(vZoomTool, new ZoomTool(mFigures))
                 .put(vSelectButton, new SelectTool())
                 .build();
         mTools = new ArrayList<>(tools.size());

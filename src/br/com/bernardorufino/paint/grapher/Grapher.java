@@ -1,10 +1,7 @@
 package br.com.bernardorufino.paint.grapher;
 
 import br.com.bernardorufino.paint.ext.*;
-import br.com.bernardorufino.paint.figures.CircleFigure;
-import br.com.bernardorufino.paint.figures.LineFigure;
-import br.com.bernardorufino.paint.figures.Polygon;
-import br.com.bernardorufino.paint.figures.PolygonFigure;
+import br.com.bernardorufino.paint.figures.*;
 import br.com.bernardorufino.paint.utils.DrawUtils;
 import com.google.common.base.Converter;
 import com.google.common.collect.ImmutableList;
@@ -464,7 +461,7 @@ public class Grapher {
         floodFill(seed); //calls floodFill for the calculated center
     }
 
-    public void applyZoom(Point p, Point q) {
+    public void applyZoom(Point p, Point q, List<PersistableFigure> mFigures) {
         FrameBuffer fb = getFrameBuffer();
 
         int width = fb.getWidth();
@@ -484,7 +481,24 @@ public class Grapher {
         M.scale(s);
         M.translate(width/2, height/2);
 
+        Clipper clipper = new Clipper();
+        clipper.setWindow(p, q);
 
+        List<PersistableFigure> toBeRemoved = new ArrayList<>();
+        for (PersistableFigure figure : mFigures) {
+            if (!(figure instanceof PolygonFigure)) {
+                toBeRemoved.add(figure);
+            }
+        }
+        for (PersistableFigure figure : toBeRemoved) {
+            mFigures.remove(figure);
+        }
+        List<PersistableFigure> newPolys = new ArrayList<>();
+        for (PersistableFigure figure : mFigures) {
+            PolygonFigure poly = (PolygonFigure) figure;
+            newPolys.add(clipper.clipPolygon(poly));
+
+        }
         //Point newP = M.doTransformation(p);
         //Point newQ = M.doTransformation(q);
         //DrawFigures();

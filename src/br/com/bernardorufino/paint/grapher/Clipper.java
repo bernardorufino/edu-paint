@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Created by diogosfreitas on 02/10/2014.
  */
-public class LineClipping {
+public class Clipper {
     private double height, width;
     private int mWXL = 0, mWYL = 0,
             mWXH = 1, mWYH = 1;
