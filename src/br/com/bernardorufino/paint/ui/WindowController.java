@@ -75,6 +75,7 @@ public class WindowController extends ContextAwareController implements Initiali
     @FXML public ToggleButton vScanLineTool;
     @FXML public ToggleButton vFloodFillTool;
     @FXML public ToggleButton vCircleFill;
+    @FXML public ToggleButton vZoomTool;
 
     @FXML public ToggleGroup mToolToggle;
     @FXML public ColorPicker vForegroundColorPicker;
@@ -87,7 +88,6 @@ public class WindowController extends ContextAwareController implements Initiali
     private FrameBuffer mFb;
     private Grapher mGrapher;
     private List<Tool> mTools;
-
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -121,6 +121,7 @@ public class WindowController extends ContextAwareController implements Initiali
                 .put(vFloodFillTool, new FloodFillTool())
                 .put(vScanLineTool, new ScanLineTool())
                 .put(vCircleFill, new CircleFillTool())
+                .put(vZoomTool, new ZoomTool())
                 .build();
         mTools = new ArrayList<>(tools.size());
         tools.forEach((button, tool) -> {

@@ -20,19 +20,37 @@ public class FrameBuffer {
 
     private int[][] mFb;
     private final GraphicsContext mGc; /* TODO: privatize */
-    private final int mWidth;
-    private final int mHeight;
+    private int mWidth;
+    private int mHeight;
     private final int mResizeFactor;
     private Set<Point> mModifiedPoints;
     private boolean mRecoverableMode;
     private State mSavedState;
 
+    private double mX_start, mY_start, mX_end, mY_end;
+    private double  mWXS = 0, mWYS = 0,
+            mWXH = 1, mWYH = 1;
+    private double  mVXS = 0, mVYS = 0,
+            mVXH = 1, mVYH = 1;
+    private double mVWSX, mVWSY;
+    private double mX, mY;
+
+    private int inside = 0, bottom = 1, top = 2, right = 4, left = 8;
+
+
     public FrameBuffer(GraphicsContext gc, int resizeFactor) {
         mGc = gc;
         mResizeFactor = resizeFactor;
         Canvas canvas = gc.getCanvas();
-        mWidth = (int) canvas.getWidth();
-        mHeight = (int) canvas.getHeight();
+
+
+        mX_start = mY_start = 0;
+        mX_end = mWidth = (int) canvas.getWidth();
+        mY_end = mHeight = (int) canvas.getHeight();
+
+        setViewport(0, 0, 1, 1);
+        setWindow(0, 0, mWidth, mHeight);
+
         mFb = new int[i(mWidth)][i(mHeight)];
     }
 
@@ -116,6 +134,20 @@ public class FrameBuffer {
 
     public GraphicsContext getGraphicsContext() {
         return mGc;
+    }
+
+    public void setWindow(double x1, double y1, double x2, double y2) {
+        mWXS = x1; mWYS = y1;
+        mWXH = x2; mWYH = y2;
+        mVWSX = (mVXH - mVXS)/(mWXH - mWXS);
+        mVWSY = (mVYH - mVYS)/(mWYH - mWYS);
+    }
+
+    public void setViewport(double x1, double y1, double x2, double y2) {
+        mVXS = x1; mVYS = y1;
+        mVXH = x2; mVYH = y2;
+        mVWSX = (mVXH - mVXS)/(mWXH - mWXS);
+        mVWSY = (mVYH - mVYS)/(mWYH - mWYS);
     }
 
     public static class State {
