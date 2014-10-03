@@ -158,6 +158,8 @@ public class Grapher {
         p = direct.convert(p);
         q = direct.convert(q);
         // Always start with the one to the left
+        assert q != null;
+        assert p != null;
         if (q.x < p.x) {
             Point tmp = p;
             p = q;
@@ -293,7 +295,7 @@ public class Grapher {
         setPatternDraw(PatternType.D2);
 
         List<Edge> sortedEdges = polygon.getSortedEdges();
-        List<Integer> xCrossings = new ArrayList<Integer>();
+        List<Integer> xCrossings = new ArrayList<>();
 
         for (int scanline = polygon.getYMin(); scanline <= polygon.getYMax(); scanline++)
         {
