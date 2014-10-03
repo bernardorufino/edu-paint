@@ -185,7 +185,7 @@ public class Grapher {
 
     @SuppressWarnings("Convert2MethodRef")
     private Converter<Point, Point> getConverter(Point p, Point q) {
-        // Convert from any octant to the 1st octant (index 0)
+        // Converts from any octant to the 1st octant (index 0)
         switch (octant(q.minus(p))) {
             case 0: return Converter.from(r -> r                       , r -> r);
             case 1: return Converter.from(r -> r.transpose()           , r -> r.transpose());
@@ -379,6 +379,7 @@ public class Grapher {
         floodFillTriangulatedPolygon(poly); // fill the last triangle
     }
 
+    //determines whether a given point p is inside or outside the given polygon
     private static boolean isInsidePolygon(List<Point> polygon, Point p) {
         List<Pair<Point, Point>> edges = polygon.stream().collect(() -> Lists.newArrayList(Pair.of(null, null)), (ArrayList<Pair<Point, Point>> es, Point q) -> {
             es.get(es.size() - 1).last = q;
@@ -392,16 +393,18 @@ public class Grapher {
                 .count() % 2 == 1;
     }
 
+    //fills a triangle resulting from the ear clipping algorithm
     private void floodFillTriangulatedPolygon (List<Point> poly) {
         Point seed = Point.at(0, 0);
         for (Point vertex : poly) {
             seed.x += vertex.x;
             seed.y += vertex.y;
         }
+        //calculates the center of the figure
         seed.x /= poly.size();
         seed.y /= poly.size();
 
-        floodFill(seed);
+        floodFill(seed); //calls floodFill for the calculated center
     }
 
     private static enum PatternType { D1, D2, NONE }
