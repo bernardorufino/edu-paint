@@ -10,11 +10,10 @@ import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.paint.Color;
 
-import javax.sound.sampled.Line;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public class Grapher {
 
@@ -108,21 +107,33 @@ public class Grapher {
         return this;
     }
 
+    public Grapher drawPixel(Point p, int color) {
+        // Checks whether is supposed to show the pixel, because we could be on
+        // a negative bit of a pattern, hence shouldn't draw the pixel. After
+        // checking increment the pixel counter to use for the pattern.
+        if (showPixelAndAdjustPattern(p)) {
+            mFb.setPixel(p.x, p.y, color);
+        }
+        return this;
+    }
+
     // Draws only if the pixel is within the boundaries of the FrameBuffer
     public Grapher safeDrawPixel(Point p) {
         if (!mFb.contains(p)) return this;
         return drawPixel(p);
     }
 
+    private static final double EPS = 0.001;
+
     // Accepts the initial point p, final point q and a function which is supposed to
     // write the pixel on screen.
-    private LineFigure drawDdaLine(Point p, Point q, Consumer<? super Point> pixelWriter) {
+    private LineFigure drawDdaLine(Point p, Point q, BiConsumer<? super Point, Double> pixelWriter) {
         // Sets the length as the greatest difference of coordinates, in order not to
         // skip pixels. Practically we invert x and y in case the angular coefficient of
         // the line is greater than 1
         int length = Math.max(Math.abs(q.x - p.x), Math.abs(q.y - p.y));
         if (length == 0) {
-            pixelWriter.accept(p);
+            pixelWriter.accept(p, 1.0);
             return null;
         }
         // Calculate increments base on length, they can be 1, -1, m, -m, 1/m or -1/m
@@ -133,8 +144,15 @@ public class Grapher {
         double y = p.y;
         for (int i = 0; i <= length; i++) {
             // Round operation makes sure the line point goes to the nearest pixel
-            Point r = Point.at(Math.round(x), Math.round(y));
-            pixelWriter.accept(r);
+            if (x - ((int) x) < EPS) {
+                int iy = (int) y;
+                pixelWriter.accept(Point.at(x, iy), y - iy);
+                pixelWriter.accept(Point.at(x, iy + 1), 1 - (y - iy));
+            } else {
+                int ix = (int) x;
+                pixelWriter.accept(Point.at(ix, y), x - ix);
+                pixelWriter.accept(Point.at(ix + 1, y), 1 - (x - ix));
+            }
             // Increment the coordinates of the point
             x += dx;
             y += dy;
@@ -142,9 +160,11 @@ public class Grapher {
         return new LineFigure(p, q, getConfiguration());
     }
 
+
+
     public Grapher drawXorLine(Point p, Point q) {
         // Calls the DDA algorithm with the drawXorPixel function
-        drawDdaLine(p, q, this::drawXorPixel);
+        drawDdaLine(p, q, (a, b) -> drawXorPixel(a));
         return this;
     }
 
@@ -153,7 +173,10 @@ public class Grapher {
         // write on the screen
         setPatternDraw(PatternType.D1);
         // Calls the DDA algorithm with drawPixel function
-        drawDdaLine(p, q, this::drawPixel);
+        drawDdaLine(p, q, (px, amount) -> {
+            int color = getPixelColor(px);
+            drawPixel(px, DrawUtils.mergeColors(getColor(), color, 1 - amount));
+        });
         return new LineFigure(p, q, getConfiguration());
     }
 
@@ -164,6 +187,7 @@ public class Grapher {
         drawBresenhamLine(p, q, this::safeDrawPixel);
         return this;
     }
+
 
     public LineFigure drawBresenhamLine(Point p, Point q) {
         drawBresenhamLine(p, q, PatternType.D1);

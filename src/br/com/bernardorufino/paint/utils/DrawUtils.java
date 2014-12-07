@@ -5,6 +5,8 @@ import javafx.scene.paint.Color;
 
 import java.util.BitSet;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 public class DrawUtils {
 
     public static BitSet pattern(String pattern) {
@@ -47,6 +49,19 @@ public class DrawUtils {
         int g = (int) (Math.round(color.getGreen() * 255));
         int b = (int) (Math.round(color.getBlue() * 255));
         return (a << 24) | (r << 16) | (g << 8) | b;
+    }
+
+    public static Color mergeColors(Color a, Color b, double amount) {
+        checkArgument(0 <= amount && amount <= 1, "amount = " + amount + " should be btw 0 and 1 inclusive");
+
+        return Color.rgb(
+                (int) Math.round(amount * a.getRed() * 255 + (1 - amount) * b.getRed() * 255),
+                (int) Math.round(amount * a.getGreen() * 255 + (1 - amount) * b.getGreen() * 255),
+                (int) Math.round(amount * a.getBlue() * 255 + (1 - amount) * b.getBlue() * 255));
+    }
+
+    public static int mergeColors(int a, int b, double amount) {
+        return fromColorToInt(mergeColors(fromIntTocolor(a), fromIntTocolor(b), amount));
     }
 
     public static int positionFor(double r, int resizeFactor) {
